@@ -57,7 +57,6 @@ flowchart LR
     class Master bgMaster;
     class Worker bgWorker;
 
-
 ```mermaid
 flowchart TB
 
@@ -77,12 +76,12 @@ flowchart TB
 
     %% Bind Mount
     subgraph "Host System"
-        H1[/host/path/demo]
+        H1["/host/path/demo"]
     end
 
     %% Docker Storage
     subgraph "Docker Storage"
-        D1[/var/lib/docker/volumes/...]
+        D1["/var/lib/docker/volumes/..."]
     end
 
     %% Connections

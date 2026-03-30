@@ -56,3 +56,41 @@ flowchart LR
     %% Apply background styles to subgraphs
     class Master bgMaster;
     class Worker bgWorker;
+
+
+```mermaid
+flowchart TB
+
+    subgraph Container
+        C1[Container Filesystem]
+    end
+
+    %% Anonymous Volume
+    subgraph "Anonymous Volume"
+        A1[Random Volume ID]
+    end
+
+    %% Named Volume
+    subgraph "Named Volume"
+        N1[Named Volume: myvolume]
+    end
+
+    %% Bind Mount
+    subgraph "Host System"
+        H1[/host/path/demo]
+    end
+
+    %% Docker Storage
+    subgraph "Docker Storage"
+        D1[/var/lib/docker/volumes/...]
+    end
+
+    %% Connections
+    C1 -->|Anonymous Mount| A1
+    A1 --> D1
+
+    C1 -->|Named Volume| N1
+    N1 --> D1
+
+    C1 -->|Bind Mount| H1
+```

@@ -37,7 +37,8 @@
     - [1️⃣ Kubelet](#1️⃣-kubelet)
     - [2️⃣ Kube-Proxy](#2️⃣-kube-proxy)
     - [3️⃣ Container Runtime](#3️⃣-container-runtime)
-- [Kubernetes Pod Creation \& Networking Flow](#kubernetes-pod-creation--networking-flow)
+  - [☸️ Kubernetes Pod Creation Flow (Mermaid Diagram)](#️-kubernetes-pod-creation-flow-mermaid-diagram)
+  - [✅ Notes](#-notes)
   - [🎯 Key Interview Points](#-key-interview-points)
   - [✅ Summary](#-summary-1)
   - [☸️ Kubernetes Pod Creation Flow](#️-kubernetes-pod-creation-flow)
@@ -418,65 +419,63 @@ These plugins handle Pod networking and IP management.
 
 ---
 
-# Kubernetes Pod Creation & Networking Flow
+## ☸️ Kubernetes Pod Creation Flow (Mermaid Diagram)
 
 ```mermaid
 flowchart LR
-    %% Define User
-    U((fa:fa-user External\nUser))
 
-    %% Master Node Subgraph
-    subgraph Master Node
-        direction TB
-        API[fa:fa-server API Server]
-        ETCD[(fa:fa-database etcd)]
-        SCHED[fa:fa-calendar-check Scheduler]
-        CM[fa:fa-cogs Control Manager]
-        
-        %% Internal Master Node Flow
-        API -- "2. Validated &\nstored in etcd" --> ETCD
-        API <-- "Watch loop logic" --> SCHED
-        SCHED -- "3. Selects suitable worker node\n4. Sends decision back" --> API
-        CM -.-> API
+    %% User
+    U[User (kubectl)]
+
+    %% Control Plane
+    subgraph Control_Plane
+        API[API Server]
+        ETCD[(etcd)]
+        SCHED[Scheduler]
+        CM[Controller Manager]
     end
 
-    %% Worker Node Subgraph
-    subgraph Worker Node
-        direction TB
-        KPROXY[fa:fa-network-wired kube-proxy]
-        KLET[fa:fa-microchip Kubelet]
-        CRI[fa:fa-box-open Container Runtime\ncontainerd]
-        CNI[fa:fa-plug CNI Plugin]
-        
-        subgraph Pod Area
-            POD(fa:fa-cubes Pod\nContainers\ne.g. 10.244.1.2)
+    %% Worker Node
+    subgraph Worker_Node
+        KLET[Kubelet]
+        CRI[Container Runtime]
+        CNI[CNI Plugin]
+        KPROXY[Kube-Proxy]
+
+        subgraph Pod
+            POD[Pod (Containers)]
         end
-        
-        %% Internal Worker Node Flow
-        KLET -- "6. Talks to CRI to\ncreate containers" --> CRI
-        CRI --> POD
-        KLET -- "7. Ensures Pod is\nrunning as expected" --> POD
-        KLET -. "8. CNI invoked by\nkubelet/CRI" .-> CNI
-        CRI -.-> CNI
-        CNI -- "9. Assigns IP &\nsets up networking" --> POD
-        KPROXY -- "10. Configures network\nrules (iptables/IPVS)" --> POD
     end
 
-    %% Cross-Node & External Flow
-    U -- "1. Request sent\nDeploy Pod (YAML)" --> API
-    API -- "5. Instructs kubelet on\nselected worker node" --> KLET
-    API -- "Service Updates\n(endpoints)" --> KPROXY
+    %% Flow
+    U -->|1. Deploy Pod| API
+    API -->|2. Store State| ETCD
+    API <-->|Watch| SCHED
+    SCHED -->|3. Select Node| API
+    API -->|4. Instruct| KLET
 
-    %% Theming and Styling 
-    classDef default fill:#1e1e1e,stroke:#333,stroke-width:2px,color:#fff;
-    classDef master fill:#0d47a1,stroke:#64b5f6,stroke-width:2px,color:#fff;
-    classDef worker fill:#1b5e20,stroke:#81c784,stroke-width:2px,color:#fff;
-    classDef pod fill:#4a148c,stroke:#ce93d8,stroke-width:2px,color:#fff;
-    
-    class API,ETCD,SCHED,CM master;
-    class KLET,KPROXY,CRI,CNI worker;
-    class POD,Pod Area pod;
+    KLET -->|5. Create Containers| CRI
+    CRI -->|6. Start Pod| POD
+    KLET -->|7. Monitor| POD
+
+    KLET -.->|8. Call CNI| CNI
+    CRI -.-> CNI
+    CNI -->|9. Assign IP| POD
+
+    KPROXY -->|10. Networking| POD
 ```
+
+---
+
+## ✅ Notes
+
+* GitHub Mermaid **does not support icons**, so kept it clean
+* Use `_` instead of spaces in subgraph names
+* Works perfectly in:
+
+  * GitHub README
+  * VS Code Markdown preview
+
 
 ---
 

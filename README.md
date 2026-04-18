@@ -432,7 +432,7 @@ flowchart LR
         ETCD[(fa:fa-database etcd)]
         SCHED[fa:fa-calendar-check Scheduler]
         CM[fa:fa-cogs Control Manager]
-
+        
         %% Internal Master Node Flow
         API -- "2. Validated &\nstored in etcd" --> ETCD
         API <-- "Watch loop logic" --> SCHED
@@ -445,13 +445,13 @@ flowchart LR
         direction TB
         KPROXY[fa:fa-network-wired kube-proxy]
         KLET[fa:fa-microchip Kubelet]
-        CRI[fa:fa-box-open Container Runtime\n(containerd)]
+        CRI[fa:fa-box-open Container Runtime\ncontainerd]
         CNI[fa:fa-plug CNI Plugin]
-
+        
         subgraph Pod Area
-            POD(((fa:fa-cubes Pod\nContainers\ne.g. 10.244.1.2)))
+            POD(fa:fa-cubes Pod\nContainers\ne.g. 10.244.1.2)
         end
-
+        
         %% Internal Worker Node Flow
         KLET -- "6. Talks to CRI to\ncreate containers" --> CRI
         CRI --> POD
@@ -472,7 +472,7 @@ flowchart LR
     classDef master fill:#0d47a1,stroke:#64b5f6,stroke-width:2px,color:#fff;
     classDef worker fill:#1b5e20,stroke:#81c784,stroke-width:2px,color:#fff;
     classDef pod fill:#4a148c,stroke:#ce93d8,stroke-width:2px,color:#fff;
-
+    
     class API,ETCD,SCHED,CM master;
     class KLET,KPROXY,CRI,CNI worker;
     class POD,Pod Area pod;

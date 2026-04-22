@@ -37,7 +37,6 @@
     - [1️⃣ Kubelet](#1️⃣-kubelet)
     - [2️⃣ Kube-Proxy](#2️⃣-kube-proxy)
     - [3️⃣ Container Runtime](#3️⃣-container-runtime)
-  - [🎨 Kubernetes Pod Flow (With Icons - GitHub Compatible)](#-kubernetes-pod-flow-with-icons---github-compatible)
   - [🎯 Key Interview Points](#-key-interview-points)
   - [✅ Summary](#-summary-1)
 - [🚀 Kubernetes Pod Creation \& Networking Flow](#-kubernetes-pod-creation--networking-flow)
@@ -417,7 +416,7 @@ These plugins handle Pod networking and IP management.
 
 ---
 
-## 🎨 Kubernetes Pod Flow (With Icons - GitHub Compatible)
+<!-- ## 🎨 Kubernetes Pod Flow (With Icons - GitHub Compatible)
 
 ```mermaid id="k8sicons1"
 flowchart LR
@@ -473,7 +472,7 @@ class U user;
 class API,ETCD,SCHED,CM master;
 class KLET,CRI,CNI,KPROXY worker;
 class POD pod;
-```
+<!-- ```  -->
 
 
 ---

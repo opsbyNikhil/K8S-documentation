@@ -125,6 +125,10 @@
   - [🚀 Create Pod](#-create-pod)
   - [📄 Get Pod Information](#-get-pod-information)
   - [🔄 Watch Pod Status (Real-Time)](#-watch-pod-status-real-time)
+  - [❌ Delete Pod](#-delete-pod)
+  - [🔁 Replace Pod (Force)](#-replace-pod-force)
+  - [🖥️ Login into Pod (Exec)](#️-login-into-pod-exec)
+  - [🔍 Describe Pod (Detailed Info)](#-describe-pod-detailed-info)
   - [🧾 Get Pod YAML Configuration](#-get-pod-yaml-configuration)
 
 ---
@@ -1258,7 +1262,7 @@ kubectl get po
 kubectl get po -w
 ```
 > Continuously watches Pod status (Running, Pending, Error, etc.)
-```
+
 
 ---
 
@@ -1267,7 +1271,7 @@ kubectl get po -w
 kubectl delete pod <podname>
 ```
 > Deletes the specified Pod
-```
+
 
 ---
 
@@ -1276,7 +1280,7 @@ kubectl delete pod <podname>
 kubectl replace --force -f <filename.yaml>
 ```
 > Deletes and recreates the Pod from the YAML file
-```
+
 
 ---
 
@@ -1285,7 +1289,7 @@ kubectl replace --force -f <filename.yaml>
 kubectl exec -it <podname> -- bash
 ```
 > Accesses the Pod container terminal
-```
+
 
 ---
 

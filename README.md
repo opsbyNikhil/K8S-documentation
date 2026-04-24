@@ -54,7 +54,6 @@
     - [Step 10: Kubelet Ensures Desired State](#step-10-kubelet-ensures-desired-state)
     - [Step 11: kube-proxy Handles Service Networking](#step-11-kube-proxy-handles-service-networking)
   - [🔄 Summary Flow](#-summary-flow)
-  - [kube-proxy → Service Routing](#kube-proxy--service-routing)
   - [📊 Kubernetes Pod Creation \& Networking Flow](#-kubernetes-pod-creation--networking-flow-1)
   - [🔄 Kubernetes Pod Creation \& Networking Flow (Step-by-Step)](#-kubernetes-pod-creation--networking-flow-step-by-step)
     - [🚀 Step-by-Step Flow](#-step-by-step-flow)
@@ -130,6 +129,131 @@
   - [🖥️ Login into Pod (Exec)](#️-login-into-pod-exec)
   - [🔍 Describe Pod (Detailed Info)](#-describe-pod-detailed-info)
   - [🧾 Get Pod YAML Configuration](#-get-pod-yaml-configuration)
+- [Main Containers in Kubernetes](#main-containers-in-kubernetes)
+  - [Key Points](#key-points)
+  - [Running Application Inside a Pod](#running-application-inside-a-pod)
+    - [Example](#example)
+  - [Single Container Pod Example (Nginx)](#single-container-pod-example-nginx)
+  - [Alpine Container Behavior](#alpine-container-behavior)
+  - [Kubernetes Pod with Command \& Args](#kubernetes-pod-with-command--args)
+  - [Summary](#summary)
+- [Init Containers in Kubernetes](#init-containers-in-kubernetes)
+  - [Key Points](#key-points-1)
+  - [Why Use Init Containers?](#why-use-init-containers)
+    - [Example Use Case](#example-use-case)
+  - [Example: Init Container with Shared Volume](#example-init-container-with-shared-volume)
+  - [Summary](#summary-1)
+- [Sidecar Containers in Kubernetes](#sidecar-containers-in-kubernetes)
+  - [Key Points](#key-points-2)
+  - [Why Use Sidecar Containers?](#why-use-sidecar-containers)
+    - [Common Use Cases](#common-use-cases)
+  - [Example: Sidecar for Log Monitoring](#example-sidecar-for-log-monitoring)
+  - [Summary](#summary-2)
+- [Ambassador Containers](#ambassador-containers)
+  - [Key Points](#key-points-3)
+    - [Communication Flow](#communication-flow)
+    - [Why Use Ambassador Containers?](#why-use-ambassador-containers)
+    - [Example Use Case](#example-use-case-1)
+- [Ephemeral Containers](#ephemeral-containers)
+  - [Key Points](#key-points-4)
+  - [Why Use Ephemeral Containers?](#why-use-ephemeral-containers)
+    - [Example Use Case](#example-use-case-2)
+    - [Summary](#summary-3)
+- [MySQL Database Pod Creation in Kubernetes](#mysql-database-pod-creation-in-kubernetes)
+  - [1. Using Docker](#1-using-docker)
+    - [Pull MySQL Image](#pull-mysql-image)
+    - [Run MySQL Container](#run-mysql-container)
+    - [Explanation](#explanation)
+  - [2. Using Kubernetes Pod (YAML)](#2-using-kubernetes-pod-yaml)
+  - [3. Deploy the Pod](#3-deploy-the-pod)
+  - [4. Access the Pod](#4-access-the-pod)
+  - [5. Login to MySQL Database](#5-login-to-mysql-database)
+    - [Example](#example-1)
+- [Pod Lifecycle in Kubernetes](#pod-lifecycle-in-kubernetes)
+  - [1. Pending](#1-pending)
+    - [Pod Status Table](#pod-status-table)
+  - [2. Running](#2-running)
+    - [Pod Status Table](#pod-status-table-1)
+  - [3. Succeeded (Completed)](#3-succeeded-completed)
+    - [Example YAML](#example-yaml)
+    - [Pod Status Table](#pod-status-table-2)
+  - [4. Failed](#4-failed)
+    - [Example YAML](#example-yaml-1)
+    - [Pod Status Table](#pod-status-table-3)
+  - [5. Unknown](#5-unknown)
+- [Container States in Kubernetes](#container-states-in-kubernetes)
+  - [1. Waiting](#1-waiting)
+  - [2. Running](#2-running-1)
+  - [3. Terminated (Success)](#3-terminated-success)
+  - [4. Terminated (Error)](#4-terminated-error)
+  - [Summary Table](#summary-table)
+- [Amazon EKS (Elastic Kubernetes Service)](#amazon-eks-elastic-kubernetes-service)
+  - [EKS Cluster Architecture](#eks-cluster-architecture)
+  - [1. Control Plane (Managed by AWS)](#1-control-plane-managed-by-aws)
+  - [2. Data Plane (Managed by User)](#2-data-plane-managed-by-user)
+  - [Summary](#summary-4)
+- [Creation of EKS Cluster](#creation-of-eks-cluster)
+  - [Ways to Create an EKS Cluster](#ways-to-create-an-eks-cluster)
+  - [Creating EKS Cluster using eksctl](#creating-eks-cluster-using-eksctl)
+    - [Step 1: Create Server \& Connect](#step-1-create-server--connect)
+    - [Step 2: Update System](#step-2-update-system)
+    - [Step 3: Install AWS CLI](#step-3-install-aws-cli)
+    - [Step 4: Install kubectl](#step-4-install-kubectl)
+    - [Step 5: Install eksctl](#step-5-install-eksctl)
+    - [Step 6: Create EKS Cluster](#step-6-create-eks-cluster)
+  - [Label-Based Filtering Commands](#label-based-filtering-commands)
+- [EKS Cluster Creation using Terraform](#eks-cluster-creation-using-terraform)
+  - [Step 1: Create Server \& Connect](#step-1-create-server--connect-1)
+  - [Step 2: Install Required Packages](#step-2-install-required-packages)
+  - [Step 3: Install AWS CLI](#step-3-install-aws-cli-1)
+  - [Step 4: Install Terraform](#step-4-install-terraform)
+  - [Step 4: Use Terraform EKS Repository](#step-4-use-terraform-eks-repository)
+  - [Step 5: Deploy EKS Cluster](#step-5-deploy-eks-cluster)
+  - [Step 6: Verify Cluster in AWS](#step-6-verify-cluster-in-aws)
+  - [Step 7: Verify using kubectl](#step-7-verify-using-kubectl)
+  - [Step 8: Install kubectl](#step-8-install-kubectl)
+  - [Step 9: Configure kubeconfig](#step-9-configure-kubeconfig)
+    - [Example](#example-2)
+  - [Kubernetes Networking Concept](#kubernetes-networking-concept)
+- [EKS Cluster Service Type: ClusterIP](#eks-cluster-service-type-clusterip)
+  - [ClusterIP Service](#clusterip-service)
+  - [Key Points](#key-points-5)
+  - [How It Works](#how-it-works)
+  - [Pod YAML Example](#pod-yaml-example)
+  - [Service YAML (ClusterIP)](#service-yaml-clusterip)
+  - [To Check Pods](#to-check-pods)
+  - [To Check Service](#to-check-service)
+  - [How to Communicate (Internal Access)](#how-to-communicate-internal-access)
+    - [Get Service ClusterIP:](#get-service-clusterip)
+    - [Access using curl:](#access-using-curl)
+  - [Interview Point ⭐](#interview-point-)
+- [NodePort Service in Kubernetes](#nodeport-service-in-kubernetes)
+  - [What is NodePort?](#what-is-nodeport)
+  - [Key Points](#key-points-6)
+  - [Architecture](#architecture)
+  - [Prerequisites (EKS Setup)](#prerequisites-eks-setup)
+    - [Install:](#install)
+  - [Pod YAML](#pod-yaml)
+  - [Service YAML (NodePort)](#service-yaml-nodeport)
+  - [To Check Pods](#to-check-pods-1)
+  - [To Check Service](#to-check-service-1)
+  - [How to Access Application](#how-to-access-application)
+    - [1. Get Node IP:](#1-get-node-ip)
+    - [2. Access in browser:](#2-access-in-browser)
+- [LoadBalancer Service in Kubernetes](#loadbalancer-service-in-kubernetes)
+  - [What is LoadBalancer?](#what-is-loadbalancer)
+  - [Key Points](#key-points-7)
+  - [Architecture](#architecture-1)
+  - [Pod YAML](#pod-yaml-1)
+  - [Service YAML (LoadBalancer)](#service-yaml-loadbalancer)
+  - [Apply Resources](#apply-resources)
+    - [Check Pods](#check-pods-1)
+    - [Check Service](#check-service)
+  - [How to Access](#how-to-access)
+- [ExternalName / External DNS Name](#externalname--external-dns-name)
+  - [Pod YAML](#pod-yaml-2)
+  - [serviec YAML(Service)](#serviec-yamlservice)
+- [Service types flow in K8S:](#service-types-flow-in-k8s)
 
 ---
 
@@ -465,11 +589,13 @@ This document explains the step-by-step flow of how a Pod is created and how net
 ## 📌 Control Plane Flow
 
 ### Step 1: Request to API Server
+
 The user (via `kubectl` or API call) sends a Pod creation request to the API Server, which acts as the entry point to the Kubernetes control plane.
 
 ---
 
 ### Step 2: Validation & Persistence
+
 - The API Server:
   - Authenticates the request
   - Validates the configuration
@@ -478,6 +604,7 @@ The user (via `kubectl` or API call) sends a Pod creation request to the API Ser
 ---
 
 ### Step 3: Controller Manager Reaction
+
 - Continuously watches the API Server
 - Ensures desired state is maintained
 - Example:
@@ -486,6 +613,7 @@ The user (via `kubectl` or API call) sends a Pod creation request to the API Ser
 ---
 
 ### Step 4: Scheduler Watches for Unscheduled Pods
+
 ⚠️ Important: Scheduler looks for **unscheduled Pods** (not just new Pods)
 
 - Scheduler:
@@ -497,6 +625,7 @@ The user (via `kubectl` or API call) sends a Pod creation request to the API Ser
 ---
 
 ### Step 5: Scheduler Updates API Server
+
 - Scheduler binds the Pod to a selected node
 - Updates Pod specification in API Server
 
@@ -505,6 +634,7 @@ The user (via `kubectl` or API call) sends a Pod creation request to the API Ser
 ## 🖥️ Worker Node Flow
 
 ### Step 6: Kubelet Watches API Server
+
 - Kubelet on the worker node:
   - Detects Pods assigned to its node
   - Watches API Server continuously
@@ -512,12 +642,14 @@ The user (via `kubectl` or API call) sends a Pod creation request to the API Ser
 ---
 
 ### Step 7: Kubelet → Container Runtime (CRI)
+
 - Kubelet retrieves Pod spec
 - Communicates with container runtime via **CRI (Container Runtime Interface)**
 
 ---
 
 ### Step 8: Container Runtime Responsibilities
+
 The container runtime (e.g., containerd, CRI-O):
 
 - Pulls image from registry (if not present)
@@ -531,9 +663,11 @@ The container runtime (e.g., containerd, CRI-O):
 ---
 
 ### Step 9: Networking Setup via CNI
+
 - CNI (Container Network Interface) plugin is invoked
 
 **Responsibilities:**
+
 - Assigns unique IP to Pod
 - Configures network interfaces
 - Enables Pod-to-Pod communication
@@ -541,6 +675,7 @@ The container runtime (e.g., containerd, CRI-O):
 ---
 
 ### Step 10: Kubelet Ensures Desired State
+
 - Monitors container health
 - Restarts failed containers
 - Reports status to API Server
@@ -548,11 +683,13 @@ The container runtime (e.g., containerd, CRI-O):
 ---
 
 ### Step 11: kube-proxy Handles Service Networking
+
 - Runs on each node
 - Configures networking rules using:
   - iptables or IPVS
 
 **Responsibilities:**
+
 - Enables Service → Pod communication
 - Provides load balancing across Pods
 
@@ -571,6 +708,7 @@ Kubelet → Container Runtime
 CNI → Networking Setup
 ↓
 kube-proxy → Service Routing
+
 ---
 
 ## 📊 Kubernetes Pod Creation & Networking Flow
@@ -623,35 +761,39 @@ This section outlines the complete lifecycle of a Pod from creation to networkin
    - Container runtime pulls image from registry (if not present)
 
 10. **Container Creation**
-   - Container runtime creates and starts container(s)
+
+- Container runtime creates and starts container(s)
 
 ---
 
 ### 🌐 Networking Setup
 
 11. **CNI Plugin**
-   - Assigns Pod IP
-   - Configures network interfaces
-   - Enables Pod-to-Pod communication
+
+- Assigns Pod IP
+- Configures network interfaces
+- Enables Pod-to-Pod communication
 
 ---
 
 ### 🔁 Monitoring & Service Networking
 
 12. **Kubelet Monitoring**
-   - Ensures Pod is running as per desired state
-   - Restarts containers if needed
+
+- Ensures Pod is running as per desired state
+- Restarts containers if needed
 
 13. **Status Reporting**
-   - Kubelet reports Pod status to API Server
+
+- Kubelet reports Pod status to API Server
 
 14. **kube-proxy**
-   - Configures **iptables/IPVS**
-   - Enables Service-to-Pod communication
-   - Provides load balancing
+
+- Configures **iptables/IPVS**
+- Enables Service-to-Pod communication
+- Provides load balancing
 
 ---
-
 
 ## 🔗 Control Plane Communication
 
@@ -1242,63 +1384,73 @@ This section covers commonly used `kubectl` commands to manage Pods.
 ---
 
 ## 🚀 Create Pod
+
 ```bash
 kubectl apply -f <filename.yaml>
 ```
+
 > Creates a Pod using the specified YAML configuration file
 
 ---
 
 ## 📄 Get Pod Information
+
 ```bash
 kubectl get po
 ```
+
 > Lists all Pods in the current namespace
 
 ---
 
 ## 🔄 Watch Pod Status (Real-Time)
+
 ```bash
 kubectl get po -w
 ```
-> Continuously watches Pod status (Running, Pending, Error, etc.)
 
+> Continuously watches Pod status (Running, Pending, Error, etc.)
 
 ---
 
 ## ❌ Delete Pod
+
 ```bash
 kubectl delete pod <podname>
 ```
-> Deletes the specified Pod
 
+> Deletes the specified Pod
 
 ---
 
 ## 🔁 Replace Pod (Force)
+
 ```bash
 kubectl replace --force -f <filename.yaml>
 ```
-> Deletes and recreates the Pod from the YAML file
 
+> Deletes and recreates the Pod from the YAML file
 
 ---
 
 ## 🖥️ Login into Pod (Exec)
+
 ```bash
 kubectl exec -it <podname> -- bash
 ```
-> Accesses the Pod container terminal
 
+> Accesses the Pod container terminal
 
 ---
 
 ## 🔍 Describe Pod (Detailed Info)
+
 ```bash
 kubectl describe pod <podname>
 ```
 
 > Shows detailed Pod information:
+>
 > - Events
 > - Status
 > - Containers
@@ -1307,10 +1459,1485 @@ kubectl describe pod <podname>
 ---
 
 ## 🧾 Get Pod YAML Configuration
+
 ```bash
 kubectl get pod <podname> -o yaml
 ```
+
 > Displays the full Pod configuration in YAML format
 
 ---
 
+# Main Containers in Kubernetes
+
+Main Containers are the primary containers inside a Kubernetes Pod that run the actual application workload. They start only after all Init Containers have successfully completed and are responsible for serving the application throughout the Pod’s lifecycle.
+
+---
+
+## Key Points
+
+- Main containers run **after Init Containers**.
+- They run **continuously** (unlike Init Containers).
+- Responsible for **business logic / application execution**.
+- A Pod can have **one or more main containers**.
+- If a main container crashes, Kubernetes may **restart it** based on the restart policy.
+- They define the **Pod’s purpose** (e.g., web server, API, backend service).
+
+---
+
+## Running Application Inside a Pod
+
+- The **main application** runs inside a Kubernetes Pod.
+- The container that runs your actual application is called the **Main Container**.
+
+### Example
+
+- Zomato application running in a single container = **Main Container**
+- One container in a Pod = **Single Pod with Main Container**
+
+---
+
+## Single Container Pod Example (Nginx)
+
+- A Pod with only one container is the simplest setup.
+- Here, we are using an **Nginx image** as the main container.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: mynginximage
+      image: nginx:1.29.8
+```
+
+---
+
+## Alpine Container Behavior
+
+By default, the Alpine image exits immediately because no long-running process is defined.
+To keep it running, we must provide a command.
+
+```bash
+docker container run -d -p 80:80 --name myapp alpine:latest sleep 1d
+```
+
+---
+
+## Kubernetes Pod with Command & Args
+
+In Kubernetes, we use command and args to override container behavior.
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: mynginximage
+      image: nginx:1.29.8
+      command:
+        - "sleep"
+      args:
+        - "1d"
+```
+
+---
+
+## Summary
+
+Main Containers are the core of any Kubernetes Pod. They ensure that the actual application runs and remains available throughout the Pod lifecycle.
+
+---
+
+# Init Containers in Kubernetes
+
+Init Containers in Kubernetes are specialized containers that run and complete **before the main application container starts** within a Pod.
+
+---
+
+## Key Points
+
+- Init containers run **sequentially (one by one)**.
+- Each init container must **complete successfully** before the next one starts.
+- The **main application container will NOT start** until all init containers finish successfully.
+- If any init container fails, Kubernetes will **restart it until it succeeds** (based on restart policy).
+- They do **not run continuously** like regular containers.
+
+---
+
+## Why Use Init Containers?
+
+Init containers are used to **prepare the environment** before the main application starts.
+
+### Example Use Case
+
+- Ensure a **database is available** before starting the application.
+- Run setup scripts (e.g., create files, load configs).
+- Wait for external services to become ready.
+
+> Example: An init container runs a script to check if a database is reachable. Only after success, the main container starts.
+
+---
+
+## Example: Init Container with Shared Volume
+
+- The init container writes HTML content into a shared volume.
+- The main container (Nginx) serves that content.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-cont
+spec:
+  initContainers:
+    - name: init-co
+      image: alpine:latest
+      command:
+        [
+          "sh",
+          "-c",
+          "echo '<h1> This is my app </h1>' >> /usr/share/nginx/html/index.html",
+        ]
+      volumeMounts:
+        - name: init-data
+          mountPath: /usr/share/nginx/html
+
+  containers:
+    - name: main-app
+      image: nginx
+      volumeMounts:
+        - name: init-data
+          mountPath: /usr/share/nginx/html
+
+  volumes:
+    - name: init-data
+      emptyDir: {}
+```
+
+---
+
+## Summary
+
+> Init Containers are used for setup and initialization tasks.
+> They ensure the main application starts only when everything is ready.
+> They run once and exit, unlike main containers.
+> Useful for dependency checks, configuration, and pre-processing tasks.
+
+---
+
+# Sidecar Containers in Kubernetes
+
+A **Sidecar Container** is a secondary container that runs alongside the main container in the same Pod to provide supporting functionality such as logging, monitoring, proxying, or configuration updates.
+
+---
+
+## Key Points
+
+- Runs **along with the main container** (not before like Init Containers)
+- Shares:
+  - **Network** (same IP address)
+  - **Storage** (shared volumes)
+- Used for **supporting tasks**, not business logic
+- Runs **continuously** as long as the Pod is running
+
+---
+
+## Why Use Sidecar Containers?
+
+Sidecar containers help extend the functionality of the main application without modifying it.
+
+### Common Use Cases
+
+- Log collection and forwarding
+- Monitoring and metrics collection
+- Reverse proxy (e.g., Envoy, Nginx sidecar)
+- Configuration updates
+- Security (e.g., service mesh sidecars like Istio)
+
+---
+
+## Example: Sidecar for Log Monitoring
+
+- The main container (Nginx) generates logs.
+- The sidecar container (BusyBox) reads and streams logs from the shared volume.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sidecar-cont
+spec:
+  containers:
+    - name: main-cont
+      image: nginx
+      volumeMounts:
+        - name: nginx-logs
+          mountPath: /var/log/nginx
+
+    # Sidecar container for log monitoring
+    - name: sidecar-container
+      image: busybox
+      command: ["sh", "-c"]
+      args: ["tail -f /var/log/nginx/error.log"]
+      volumeMounts:
+        - name: nginx-logs
+          mountPath: /var/log/nginx
+
+  volumes:
+    - name: nginx-logs
+      emptyDir: {}
+```
+
+> A sidecar container collects logs from the main application and sends them to a logging system like ELK, while the main container focuses only on business logic.
+
+---
+
+## Summary
+
+> Sidecar containers provide supporting features to the main container.
+> They run in parallel with the main application.
+> Share network and storage with the main container.
+> Commonly used for logging, monitoring, and proxying.
+
+---
+
+# Ambassador Containers
+
+An **Ambassador Container** is a sidecar container pattern used to act as a **proxy between the main application container and external services**.
+
+## Key Points
+
+- Runs inside the **same Pod**
+- Acts as a **proxy / gateway**
+- Simplifies communication with **external services**
+- Follows the **sidecar pattern**
+
+### Communication Flow
+
+> Instead of the main container directly calling an external service: Main Container → Ambassador (localhost) → External Service
+
+### Why Use Ambassador Containers?
+
+- Abstract external service details (URLs, credentials)
+- Improve security by isolating external communication
+- Simplify application configuration
+- Enable easier service replacement or migration
+
+### Example Use Case
+
+> If an application needs to connect to an external database, the **Ambassador container handles the connection**, and the main container communicates with it locally.
+
+---
+
+# Ephemeral Containers
+
+An **Ephemeral Container** is a temporary container used for **debugging purposes** in a running Pod. It can be added without restarting the Pod.
+
+## Key Points
+
+- Used only for **debugging**
+- Runs **temporarily** (not permanent)
+- Can be added to an **already running Pod**
+- Does **NOT restart automatically**
+- Cannot define:
+  - Ports
+  - Volumes
+  - Probes
+
+## Why Use Ephemeral Containers?
+
+- Debug issues in running Pods without downtime
+- Inspect containers that are crashing or not accessible
+- Run troubleshooting tools (e.g., `sh`, `curl`, `netstat`)
+
+### Example Use Case
+
+> If a container is crashing and we cannot `exec` into it, we can attach an **ephemeral container** to the Pod and debug the issue without restarting the Pod.
+
+---
+
+### Summary
+
+| Type                 | Purpose                    | Lifecycle         |
+| -------------------- | -------------------------- | ----------------- |
+| Ambassador Container | Proxy to external services | Runs continuously |
+| Ephemeral Container  | Debugging running Pods     | Temporary         |
+
+---
+
+# MySQL Database Pod Creation in Kubernetes
+
+This guide explains how to create and run a **MySQL database** using both Docker and Kubernetes Pod YAML.
+
+---
+
+## 1. Using Docker
+
+### Pull MySQL Image
+
+```bash
+docker pull mysql
+```
+
+### Run MySQL Container
+
+```bash
+docker container run -d -p 3306:3306 \
+-e MYSQL_ROOT_PASSWORD=rootroot \
+-e MYSQL_DATABASE=dockerdb \
+-e MYSQL_USER=devops \
+-e MYSQL_PASSWORD=devops \
+--name mysql_test_1 mysql:latest
+```
+
+### Explanation
+
+```bash
+-d → Run container in background
+-p 3306:3306 → Map MySQL port
+MYSQL_ROOT_PASSWORD → Root password
+MYSQL_DATABASE → Default database
+MYSQL_USER → Custom user
+MYSQL_PASSWORD → User password
+```
+
+---
+
+## 2. Using Kubernetes Pod (YAML)
+
+> Pod Manifest File
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: database-pod
+spec:
+  containers:
+    - name: database-cont
+      image: mysql
+      env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        - name: MYSQL_DATABASE
+          value: "dockerdb-1"
+        - name: MYSQL_USER
+          value: "devops"
+        - name: MYSQL_PASSWORD
+          value: "devops"
+```
+
+---
+
+## 3. Deploy the Pod
+
+```bash
+kubectl apply -f <your-file-name>.yaml
+```
+
+---
+
+## 4. Access the Pod
+
+> Enter into the Pod
+
+```bash
+kubectl exec -it <pod-name> -- bash
+```
+
+---
+
+## 5. Login to MySQL Database
+
+```bash
+mysql -u <username> -p
+```
+
+### Example
+
+```bash
+mysql -u devops -p
+```
+
+> Enter password when prompted
+
+---
+
+# Pod Lifecycle in Kubernetes
+
+The **Pod Lifecycle** defines the different phases a Pod goes through from creation to termination.
+
+---
+
+## 1. Pending
+
+- The Pod has been **accepted by the cluster** but is not yet running.
+- Containers are **not started yet**.
+
+### Pod Status Table
+
+| NAME          | READY | STATUS            | RESTARTS | AGE |
+| ------------- | ----- | ----------------- | -------- | --- |
+| pod-lifecycle | 1/1   | ContainerCreating | 0        | 40s |
+
+---
+
+## 2. Running
+
+- The Pod is successfully **scheduled on a node**.
+- At least one container is **running**.
+
+### Pod Status Table
+
+| NAME          | READY | STATUS  | RESTARTS | AGE |
+| ------------- | ----- | ------- | -------- | --- |
+| pod-lifecycle | 1/1   | Running | 0        | 40s |
+
+---
+
+## 3. Succeeded (Completed)
+
+> All containers have **terminated successfully**.
+> Exit code = **0**
+
+### Example YAML
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lifecycle
+spec:
+  containers:
+    - name: pod-lifecycle-cont
+      image: nginx
+      command: ["sh", "-c", "exit 0"]
+```
+
+### Pod Status Table
+
+| NAME          | READY | STATUS           | RESTARTS    | AGE |
+| ------------- | ----- | ---------------- | ----------- | --- |
+| pod-lifecycle | 0/1   | Completed        | 1 (2s ago)  | 3s  |
+| pod-lifecycle | 0/1   | CrashLoopBackOff | 1 (2s ago)  | 4s  |
+| pod-lifecycle | 0/1   | Completed        | 2 (13s ago) | 15s |
+
+---
+
+## 4. Failed
+
+> At least one container terminated with a non-zero exit code.
+> Indicates an error or failure.
+
+### Example YAML
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lifecycle
+spec:
+  containers:
+    - name: pod-lifecycle-cont
+      image: nginx
+      command: ["sh", "-c", "exit 1"]
+```
+
+### Pod Status Table
+
+| NAME          | READY | STATUS           | RESTARTS    | AGE |
+| ------------- | ----- | ---------------- | ----------- | --- |
+| pod-lifecycle | 0/1   | Error            | 1 (2s ago)  | 3s  |
+| pod-lifecycle | 0/1   | CrashLoopBackOff | 1 (2s ago)  | 4s  |
+| pod-lifecycle | 0/1   | Error            | 2 (13s ago) | 15s |
+
+---
+
+## 5. Unknown
+
+> The Pod state cannot be determined.
+> Usually caused by node communication issues.
+
+---
+
+![Pod Image](./images/pod-lifecycle.png)
+
+---
+
+# Container States in Kubernetes
+
+Container states describe the current condition of a container inside a Pod.
+
+---
+
+## 1. Waiting
+
+- The container is **not yet running**.
+- It is waiting to start due to conditions like:
+  - Image pulling
+  - Dependency readiness
+  - Resource allocation
+
+**Meaning:**  
+The container has not started yet and is waiting for required conditions.
+
+---
+
+## 2. Running
+
+- The container is **actively executing** its main process.
+
+**Meaning:**  
+The container has started and the application is running.
+
+---
+
+## 3. Terminated (Success)
+
+- The container has **completed execution successfully**.
+- Exit code = **0**
+
+**Meaning:**  
+The container finished execution without any errors.
+
+---
+
+## 4. Terminated (Error)
+
+- The container has **stopped due to failure**.
+- Exit code ≠ **0**
+
+**Meaning:**  
+The container exited with an error or failure.
+
+---
+
+## Summary Table
+
+| State                | Description                           |
+| -------------------- | ------------------------------------- |
+| Waiting              | Not started, waiting for conditions   |
+| Running              | Actively executing the application    |
+| Terminated (Success) | Completed successfully (exit code 0)  |
+| Terminated (Error)   | Failed execution (non-zero exit code) |
+
+---
+
+![Container States](/images/container-states.png)
+
+---
+
+# Amazon EKS (Elastic Kubernetes Service)
+
+Amazon EKS (Elastic Kubernetes Service) is a **managed Kubernetes service** provided by Amazon Web Services that runs Kubernetes control plane components, while allowing users to manage worker nodes and applications.
+
+---
+
+## EKS Cluster Architecture
+
+An EKS cluster consists of two main parts:
+
+---
+
+## 1. Control Plane (Managed by AWS)
+
+- Hosted and managed by **Amazon Web Services**
+- Includes:
+  - API Server
+  - etcd
+  - Scheduler
+  - Controller Manager
+- **Highly available** across multiple Availability Zones (AZs)
+- **No direct access** (fully managed by AWS)
+
+---
+
+## 2. Data Plane (Managed by User)
+
+- This is where your **applications run**
+- Contains:
+  - Worker Nodes (EC2 or Fargate)
+  - Pods
+  - Containers
+
+---
+
+## Summary
+
+- EKS simplifies Kubernetes management by **offloading control plane operations to AWS**
+- Users focus only on **deploying and managing applications**
+- Provides **high availability, scalability, and security**
+
+---
+
+# Creation of EKS Cluster
+
+Amazon EKS clusters can be created using multiple approaches:
+
+---
+
+## Ways to Create an EKS Cluster
+
+1. Using **AWS Console (UI)**
+2. Using **eksctl (CLI)**
+3. Using **eksctl with Terraform (Infrastructure as Code)**
+
+---
+
+## Creating EKS Cluster using eksctl
+
+### Step 1: Create Server & Connect
+
+```bash
+ssh ubuntu@<public-ip>
+```
+
+---
+
+### Step 2: Update System
+
+```bash
+sudo apt update
+sudo apt install unzip -y
+```
+
+---
+
+### Step 3: Install AWS CLI
+
+> Install AWS CLI using official documentation
+> Create an IAM user
+> Save:
+
+- > Access Key
+- > Secret Key
+  > Configure AWS CLI
+
+```bash
+aws configure
+```
+
+> Enter:
+
+- > Access Key
+- > Secret Key
+- > Region (e.g., ap-south-1)
+
+---
+
+### Step 4: Install kubectl
+
+```bash
+curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl
+
+sudo chmod +x kubectl
+sudo mv kubectl /usr/local/bin
+
+kubectl version --client
+```
+
+---
+
+### Step 5: Install eksctl
+
+```bash
+# Set architecture
+ARCH=amd64
+PLATFORM=$(uname -s)_$ARCH
+
+# Download eksctl
+curl -sLO "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_$PLATFORM.tar.gz"
+
+# (Optional) Verify checksum
+curl -sL "https://github.com/eksctl-io/eksctl/releases/latest/download/eksctl_checksums.txt" | grep $PLATFORM | sha256sum --check
+
+# Extract and install
+tar -xzf eksctl_$PLATFORM.tar.gz -C /tmp && rm eksctl_$PLATFORM.tar.gz
+
+sudo mv /tmp/eksctl /usr/local/bin
+```
+
+---
+
+### Step 6: Create EKS Cluster
+
+```bash
+eksctl create cluster
+```
+
+> OR with custom configuration
+
+```bash
+eksctl create cluster \
+--name mycluster \
+--region ap-south-1 \
+--nodes 2 \
+--node-type c7i-flex.large
+```
+
+> ⏱️ Cluster creation takes around 5–15 minutes
+
+> Automatically creates:
+
+- > Worker Nodes
+- > Load Balancer
+- > Networking components
+
+> Multiple Pod Creation in YAML
+
+- > Use --- to separate multiple resources
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-testing-pod
+  labels:
+    env: QA
+    ver: "1.0"
+spec:
+  containers:
+    - name: test-cont
+      image: nginx
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-dev-pod
+  labels:
+    env: DEV
+    ver: "1.1"
+spec:
+  containers:
+    - name: dev-cont
+      image: nginx
+```
+
+---
+
+## Label-Based Filtering Commands
+
+> Get only DEV Pods
+
+```bash
+kubectl get pod -l env=DEV
+```
+
+> Get DEV and QA Pods
+
+```bash
+kubectl get pod -l 'env in (DEV,QA)'
+```
+
+> Filter by Environment and Version
+
+```bash
+kubectl get pod -l 'env in (DEV,QA), ver in (1.0,1.1)'
+```
+
+> Filter by Version Only
+
+```bash
+kubectl get pod -l 'ver in (1.0,1.1)'
+```
+
+---
+
+# EKS Cluster Creation using Terraform
+
+This guide explains how to create an **Amazon EKS Cluster using Terraform** and verify it using `kubectl`.
+
+---
+
+## Step 1: Create Server & Connect
+
+```bash
+ssh ubuntu@<public-ip>
+```
+
+---
+
+## Step 2: Install Required Packages
+
+```bash
+sudo apt update
+sudo apt install unzip -y
+```
+
+---
+
+## Step 3: Install AWS CLI
+
+> Install AWS CLI using official documentation
+> Create an IAM user
+> Save:
+
+- > Access Key
+- > Secret Key
+  > Configure AWS CLI
+
+```bash
+aws configure
+```
+
+> Enter:
+
+- > Access Key
+- > Secret Key
+- > Region (e.g., ap-south-1)
+
+---
+
+## Step 4: Install Terraform
+
+```bash
+wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+
+sudo apt update && sudo apt install terraform
+
+```
+
+---
+
+## Step 4: Use Terraform EKS Repository
+
+```bash
+git clone https://github.com/hashicorp-education/learn-terraform-provision-eks-cluster.git
+cd learn-terraform-provision-eks-cluster
+```
+
+---
+
+## Step 5: Deploy EKS Cluster
+
+> terraform init
+> terraform apply
+> Creates:
+
+- > EKS Cluster
+- > Worker Nodes
+- > Networking components
+
+---
+
+## Step 6: Verify Cluster in AWS
+
+> Check cluster and nodes in AWS Console
+
+---
+
+## Step 7: Verify using kubectl
+
+```bash
+kubectl get nodes
+```
+
+> If this command gives an error → install kubectl
+
+---
+
+## Step 8: Install kubectl
+
+```bash
+curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+
+sudo chmod +x kubectl
+sudo mv kubectl /usr/local/bin
+
+kubectl version --client
+```
+
+---
+
+## Step 9: Configure kubeconfig
+
+```bash
+aws eks --region <region> update-kubeconfig --name <cluster-name>
+```
+
+### Example
+
+```bash
+aws eks --region us-east-2 update-kubeconfig --name education-eks-1s7xpCRm
+```
+
+---
+
+## Kubernetes Networking Concept
+
+> In Kubernetes, an application can run on multiple Pods, and each Pod gets its own IP address. However, Pods are ephemeral, so when a Pod goes down, Kubernetes recreates it with a new IP address.
+
+> Because Pod IPs are dynamic, direct communication using Pod IPs is not reliable.
+
+> To solve this, we use a Service (SVC), which provides a static IP address and DNS name. The Service uses labels and selectors to route traffic to the available Pods.
+
+> Even if Pods are recreated with new IPs, the Service remains constant and ensures uninterrupted communication.
+
+> If we want the application to be accessible from the outside world, we use Service types like NodePort or LoadBalancer.
+
+---
+
+# EKS Cluster Service Type: ClusterIP
+
+---
+
+## ClusterIP Service
+
+- Used for **internal communication** within the Kubernetes cluster
+- Accessible only **inside the cluster (Pod-to-Pod communication)**
+- Not exposed to external users (no public access)
+
+---
+
+## Key Points
+
+- ClusterIP is the **default Service type**
+- Provides a **stable internal IP address**
+- Uses **labels and selectors** to route traffic
+- Helps access **multiple Pods using a single IP**
+- Pod IPs are dynamic, but **Service IP remains constant**
+
+---
+
+## How It Works
+
+1. Create multiple Pods with the same label
+2. Create a Service with a selector matching those labels
+3. Service routes traffic to all matching Pods
+
+---
+
+## Pod YAML Example
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-pod
+  labels:
+    app: payment-app
+spec:
+  containers:
+    - name: app-image-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-pod-2
+  labels:
+    app: payment-app
+spec:
+  containers:
+    - name: app-image-2
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-pod-3
+  labels:
+    app: payment-app
+spec:
+  containers:
+    - name: app-image-3
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: eks-pod-4
+  labels:
+    app: payment-app
+spec:
+  containers:
+    - name: app-image-4
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+## Service YAML (ClusterIP)
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: service
+spec:
+  selector:
+    app: payment-app
+  type: ClusterIP
+  ports:
+    - port: 80
+      protocol: TCP
+```
+
+---
+
+## To Check Pods
+
+```bash
+kubectl get po
+```
+
+## To Check Service
+
+```bash
+kubectl get svc
+```
+
+## How to Communicate (Internal Access)
+
+```bash
+kubectl exec -it <pod-name> -- bash
+```
+
+### Get Service ClusterIP:
+
+```bash
+kubectl get svc
+```
+
+### Access using curl:
+
+```bash
+curl http://<cluster-ip>:80
+```
+
+> We can access Cluster IP using curl inside the cluster, but not via browser externally because it is a private internal service
+
+## Interview Point ⭐
+
+- When a **Pod is deleted**, its IP changes because Pods are **ephemeral**
+- The **Service ClusterIP remains the same** since it is a **stable virtual IP**
+- Service routes traffic using:
+  - **Labels**
+  - **Selectors**
+- If the **Service is deleted and recreated**, a **new ClusterIP is assigned by default**
+- To retain the same IP, we must **explicitly define a static `clusterIP`** in the Service YAML
+
+---
+
+![Kubernates-ClusterIP](./images/cluster-ip.png)
+
+---
+
+# NodePort Service in Kubernetes
+
+---
+
+## What is NodePort?
+
+- **NodePort** is a Kubernetes Service type that exposes an application to **external users**
+- It opens a **specific port on every node** in the cluster
+
+---
+
+## Key Points
+
+- Access application using:
+  - **Node IP**
+  - **NodePort**
+- Default NodePort range: **30000–32767**
+- Used for:
+  - Testing
+  - Simple deployments
+- Not recommended for production (use LoadBalancer instead)
+
+---
+
+## Architecture
+
+> External User → Node IP:NodePort → Service → Pods
+
+---
+
+---
+
+## Prerequisites (EKS Setup)
+
+- Create EC2 instance
+- Update system:
+
+```bash
+sudo apt update
+```
+
+### Install:
+
+> AWS CLI
+> Configure using aws configure
+> Create EKS cluster using Terraform / eksctl
+
+---
+
+## Pod YAML
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payment-app-1
+  labels:
+    env: DEV
+spec:
+  containers:
+    - name: pay-image-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payment-app-2
+  labels:
+    env: DEV
+spec:
+  containers:
+    - name: pay-image-2
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payment-app-3
+  labels:
+    env: DEV
+spec:
+  containers:
+    - name: pay-image-3
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: payment-app-4
+  labels:
+    env: DEV
+spec:
+  containers:
+    - name: pay-image-4
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+## Service YAML (NodePort)
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-pay
+spec:
+  selector:
+    env: DEV
+  type: NodePort
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 30008
+```
+
+---
+
+## To Check Pods
+
+```bash
+kubectl get po
+```
+
+## To Check Service
+
+```bash
+kubectl get svc
+```
+
+## How to Access Application
+
+### 1. Get Node IP:
+
+```bash
+kubectl get nodes -o wide
+```
+
+### 2. Access in browser:
+
+```bash
+"http://<Node-IP>:30008"
+```
+
+---
+
+![Kubernates-NodePort](./images/NodePort.png)
+
+---
+
+# LoadBalancer Service in Kubernetes
+
+---
+
+## What is LoadBalancer?
+
+- A **LoadBalancer** is a Kubernetes Service type that exposes an application to **external users**
+- It automatically creates a **cloud provider load balancer** (e.g., AWS ELB in EKS)
+- Distributes incoming traffic across multiple Pods
+
+---
+
+## Key Points
+
+- Provides **external access** to applications
+- Distributes traffic across multiple Pods
+- Ensures **high availability**
+- Automatically integrates with cloud providers (AWS, Azure, GCP)
+
+---
+
+## Architecture
+
+> External User → LoadBalancer → Service → Pods
+
+---
+
+## Pod YAML
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lb-1
+  labels:
+    env: LB-DEV
+spec:
+  containers:
+    - name: lb-cont-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lb-2
+  labels:
+    env: LB-DEV
+spec:
+  containers:
+    - name: lb-cont-2
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lb-3
+  labels:
+    env: LB-DEV
+spec:
+  containers:
+    - name: lb-cont-3
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-lb-4
+  labels:
+    env: LB-DEV
+spec:
+  containers:
+    - name: lb-cont-4
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+## Service YAML (LoadBalancer)
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-lb
+spec:
+  type: LoadBalancer
+  selector:
+    env: LB-DEV
+  ports:
+    - port: 80
+      protocol: TCP
+```
+
+---
+
+## Apply Resources
+
+```bash
+kubectl apply -f pod.yaml
+kubectl apply -f svc.yaml
+```
+
+### Check Pods
+
+```bash
+kubectl get po
+```
+
+### Check Service
+
+```bash
+kubectl get svc
+```
+
+> Look for EXTERNAL-IP
+
+## How to Access
+
+```bash
+"http://<EXTERNAL-IP>"
+```
+
+> Open in browser to access Nginx page
+
+---
+
+![Kubernates-LoadBalancer](/images/LoadBalancer1.png)
+
+---
+
+# ExternalName / External DNS Name
+
+> ExternalName is a Kubernetes Service type that maps a service to an external DNS name instead of routing traffic to pods.
+
+> The purpose of ExternalName is to allow applications inside the Kubernetes cluster to access external services using a simple internal service name.
+
+> ExternalName works by creating a DNS alias (CNAME record) that resolves the Kubernetes service name to the external domain name.
+
+> For example, if an application inside the cluster needs to access an external API like google.com, we can define an ExternalName service and access it using the service name instead of the actual domain.
+
+---
+
+## Pod YAML
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-1
+  labels:
+    env: EX-DEV
+spec:
+  containers:
+    - name: ex-cont-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-2
+  labels:
+    env: EX-DEV
+spec:
+  containers:
+    - name: ex-cont-2
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-3
+  labels:
+    env: EX-DEV
+spec:
+  containers:
+    - name: ex-cont-3
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-4
+  labels:
+    env: EX-DEV
+spec:
+  containers:
+    - name: ex-cont-4
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+## serviec YAML(Service)
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-pay
+spec:
+  selector:
+    env: DEV
+  type: ExternalName
+  ports:
+    - port: 80
+      protocol: TCP
+  externalName: www.google.com
+```
+
+---
+
+![Kubernates-External Name](/images/External%20Name.png)
+
+---
+
+# Service types flow in K8S:
+
+![Kubernates-all-service-types](./images/k8s-service-types.png)
+
+---

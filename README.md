@@ -254,6 +254,57 @@
   - [Pod YAML](#pod-yaml-2)
   - [serviec YAML(Service)](#serviec-yamlservice)
 - [Service types flow in K8S:](#service-types-flow-in-k8s)
+- [Kubernetes Restart Policy](#kubernetes-restart-policy)
+  - [Overview](#overview)
+  - [Types of Restart Policies](#types-of-restart-policies)
+    - [1. Always (Default)](#1-always-default)
+    - [2. OnFailure](#2-onfailure)
+    - [3. Never](#3-never)
+- [Kubernates Restart Policy](#kubernates-restart-policy)
+    - [Summary](#summary-5)
+- [Kubernetes Pod Probes (Startup Probe)](#kubernetes-pod-probes-startup-probe)
+  - [Overview](#overview-1)
+  - [Types of Probes](#types-of-probes)
+  - [Startup Probe](#startup-probe)
+    - [Definition](#definition)
+    - [Key Behavior](#key-behavior)
+    - [Why Use Startup Probe?](#why-use-startup-probe)
+- [Kubernetes Probe Types \& Arguments](#kubernetes-probe-types--arguments)
+  - [Supported Probe Types](#supported-probe-types)
+    - [httpGet](#httpget)
+    - [grpc](#grpc)
+    - [tcpSocket](#tcpsocket)
+    - [exec](#exec)
+  - [Probe Arguments](#probe-arguments)
+    - [initialDelaySeconds](#initialdelayseconds)
+    - [periodSeconds](#periodseconds)
+    - [successThreshold](#successthreshold)
+  - [Summary](#summary-6)
+    - [Kubernates Startup Probe Figure](#kubernates-startup-probe-figure)
+- [Kubernetes Liveness Probe](#kubernetes-liveness-probe)
+  - [Overview](#overview-2)
+  - [Key Points](#key-points-8)
+  - [Why Use Liveness Probe?](#why-use-liveness-probe)
+    - [Kubernates Livensss Probe Figure](#kubernates-livensss-probe-figure)
+- [Kubernetes Readiness Probe](#kubernetes-readiness-probe)
+  - [Overview](#overview-3)
+  - [Key Points](#key-points-9)
+  - [Why Use Readiness Probe?](#why-use-readiness-probe)
+    - [Kubernates Readiness Probe figure](#kubernates-readiness-probe-figure)
+- [Kubernates Probes](#kubernates-probes)
+- [Kubernetes Pod Resource Requests \& Limits - Failure](#kubernetes-pod-resource-requests--limits---failure)
+  - [Overview](#overview-4)
+  - [Requests vs Limits](#requests-vs-limits)
+    - [Requests](#requests)
+    - [Limits](#limits)
+  - [Resource Flow](#resource-flow)
+  - [Scenario](#scenario)
+  - [Pod Status (Tabular View)](#pod-status-tabular-view)
+- [Kubernetes Resource Limits – Successful Run Example](#kubernetes-resource-limits--successful-run-example)
+  - [Scenario](#scenario-1)
+  - [Pod Configuration](#pod-configuration)
+  - [Pod Status (Tabular View)](#pod-status-tabular-view-1)
+    - [](#)
 
 ---
 
@@ -2939,5 +2990,548 @@ spec:
 # Service types flow in K8S:
 
 ![Kubernates-all-service-types](./images/k8s-service-types.png) 
+
+---
+
+# Kubernetes Restart Policy
+
+## Overview
+`restartPolicy` in Kubernetes defines how the system handles container restarts when a Pod’s container stops or fails.
+
+---
+
+## Types of Restart Policies
+
+### 1. Always (Default)
+
+> The container is restarted **every time it stops**, regardless of exit status.
+
+**Use Cases**
+- Long-running applications  
+- Web servers (e.g., nginx)
+
+**Behavior**
+- Exit 0 (Success) → Restart  
+- Exit 1 (Failure) → Restart  
+
+**Example**
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-1
+  labels:
+    env: EX-DEV
+spec:
+  restartPolicy: Always
+  containers:
+    - name: ex-cont-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+### 2. OnFailure
+
+> The container restarts only if it fails (non-zero exit code).
+
+**Use Cases**
+
+> Batch jobs
+> Data processing tasks
+
+**Behavior**
+
+> Exit 0 (Success) → No restart
+> Exit 1 (Failure) → Restart
+
+**Example**
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-1
+  labels:
+    env: EX-DEV
+spec:
+  restartPolicy: OnFailure
+  containers:
+    - name: ex-cont-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+---
+
+### 3. Never
+
+> The container is never restarted, regardless of exit status.
+
+**Use Cases**
+
+> One-time execution jobs
+> Debugging
+
+**Behavior**
+
+> Exit 0 (Success) → No restart
+> Exit 1 (Failure) → No restart
+
+**Example**
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-ex-1
+  labels:
+    env: EX-DEV
+spec:
+  restartPolicy: Never
+  containers:
+    - name: ex-cont-1
+      image: nginx
+      ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+---
+# Kubernates Restart Policy
+
+![kubernates-restart-policy](./images/Pod-restart-policy.png)
+
+---
+
+### Summary
+
+| Policy    | Restart on Success | Restart on Failure | Typical Use Case          |
+| --------- | ------------------ | ------------------ | ------------------------- |
+| Always    | Yes                | Yes                | Web apps, APIs            |
+| OnFailure | No                 | Yes                | Batch jobs                |
+| Never     | No                 | No                 | Debugging, one-time tasks |
+
+---
+
+# Kubernetes Pod Probes (Startup Probe)
+
+## Overview
+> Pod probes are **health checks** used by Kubernetes to determine the status of a container and take actions based on its health.
+
+They help Kubernetes verify whether a container:
+- Is **running correctly**
+- Is **ready to serve traffic**
+- Needs to be **restarted**
+
+---
+
+## Types of Probes
+- Startup Probe  
+- Liveness Probe  
+- Readiness Probe  
+
+---
+
+## Startup Probe
+
+### Definition
+> A **Startup Probe** is used to check whether the application inside a container has **started successfully**.
+
+---
+
+### Key Behavior
+- If the startup probe **fails** → Kubernetes **restarts the container**
+- Until the startup probe **succeeds**:
+  - Liveness probe is **disabled**
+  - Readiness probe is **disabled**
+- Works **independently**:
+  - It only checks its own container
+  - It does **not depend on other Pods**
+
+---
+
+### Why Use Startup Probe?
+- Handles **slow-starting applications**
+- Prevents **premature restarts** by liveness probe
+- Ensures application is fully initialized before other checks begin
+
+**Pod YAML**
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: start-up-pod
+  labels:
+    app: startup-dev-pod
+    env: DEV
+spec:
+  containers:
+    - name: starup-cont
+      image: busybox
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      startupProbe:
+        httpGet:
+          path: /site
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+
+```
+
+# Kubernetes Probe Types & Arguments
+
+## Supported Probe Types
+
+### httpGet
+Sends an HTTP request to a specified **path** and **port** on the container.
+
+- Success → HTTP status code **200–399**
+- Commonly used for web applications
+
+---
+
+### grpc
+Performs health checks using **gRPC protocol** by calling a defined health check service.
+
+- Used for applications built with gRPC
+
+---
+
+### tcpSocket
+Checks whether a **TCP connection** can be established on a given port.
+
+- Useful for services like databases or custom TCP apps
+
+---
+
+### exec
+Executes a command inside the container.
+
+- Success → Command exits with status **0**
+- Useful for custom health checks
+
+---
+
+## Probe Arguments
+
+### initialDelaySeconds
+Time Kubernetes waits **before starting the first probe** after the container starts.
+
+---
+
+### periodSeconds
+Defines how often (in seconds) Kubernetes performs the **health check**.
+
+---
+
+### successThreshold
+Minimum number of **consecutive successful checks** required to mark the container as healthy.
+
+---
+
+## Summary
+
+| Type       | Description                              | Success Condition        |
+|------------|------------------------------------------|--------------------------|
+| httpGet    | HTTP request to container                | Status 200–399           |
+| grpc       | gRPC health check                        | Healthy response         |
+| tcpSocket  | TCP connection check                     | Connection successful    |
+| exec       | Run command inside container             | Exit code 0              |
+
+| Argument              | Purpose                                      |
+|----------------------|----------------------------------------------|
+| initialDelaySeconds  | Delay before starting probes                 |
+| periodSeconds        | Interval between probe checks                |
+| successThreshold     | Required consecutive successes               |
+
+---
+
+### Kubernates Startup Probe Figure
+
+![Kubernates-startup-probe](./images/startup-probes.png)
+
+---
+
+# Kubernetes Liveness Probe
+
+## Overview
+> A **Liveness Probe** is used to check whether a container is **alive and functioning properly** during runtime.
+
+> If the liveness probe fails, Kubernetes will **automatically restart the container**.
+
+---
+
+## Key Points
+
+- Detects **deadlocks** or **stuck applications**  
+- Runs continuously throughout the **container lifecycle**  
+- Failure → **Container Restart**  
+
+---
+
+## Why Use Liveness Probe?
+
+- Ensures application remains **responsive**
+- Recovers from **unexpected failures**
+- Prevents long-running but **unhealthy containers**
+
+---
+
+**Pod YAML**
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: start-up-pod
+  labels:
+    app: startup-dev-pod
+    env: DEV
+spec:
+  containers:
+    - name: starup-cont
+      image: busybox
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      livenessProbe:
+        tcpSocket:
+          port: 80
+      startupProbe:
+        httpGet:
+          path: /site
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3
+
+```
+### Kubernates Livensss Probe Figure
+
+![kubernates-libeness-probe-diagram](./images/liveness-probe.png)
+
+---
+
+# Kubernetes Readiness Probe
+
+## Overview
+A **Readiness Probe** is used to check whether a container is **ready to accept traffic**.
+
+If the readiness probe fails, Kubernetes **does not restart the container**.  
+Instead, it **removes the Pod from service endpoints**, so it temporarily stops receiving traffic.
+
+---
+
+## Key Points
+
+- Failure does **not kill the Pod**  
+- Pod is **removed from Service endpoints**  
+- Container **continues running**  
+- Once healthy again → Pod is **added back to service**
+
+---
+
+## Why Use Readiness Probe?
+
+- Prevents sending traffic to **unready applications**  
+- Useful during:
+  - Application startup  
+  - Configuration loading  
+  - Temporary overload or maintenance  
+
+---
+
+**Pod YAML**
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: start-up-pod
+  labels:
+    app: startup-dev-pod
+    env: DEV
+spec:
+  containers:
+    - name: starup-cont
+      image: busybox
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      livenessProbe:
+        tcpSocket:
+          port: 80
+      readinessProbe:
+        exec:
+          command: 
+            - touch pod-file
+            - tail -f /var/log/busybox/error.log
+      startupProbe:
+        httpGet:
+          path: /site
+          port: 80
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        successThreshold: 1
+        failureThreshold: 3 
+```
+
+
+### Kubernates Readiness Probe figure
+
+![kubernates-readiness-probe-diagram](./images/Readiness-probe.png)
+
+---
+
+# Kubernates Probes
+
+![Kubernates-probes](./images/All-Probes.png)
+
+---
+
+# Kubernetes Pod Resource Requests & Limits - Failure
+
+## Overview
+In Kubernetes, Pods can define **resource requests** and **resource limits** for CPU and memory.
+
+These settings help Kubernetes:
+- **Schedule Pods efficiently**
+- **Prevent resource overuse**
+- **Ensure cluster stability**
+
+---
+
+## Requests vs Limits
+
+### Requests
+Requests define the **minimum guaranteed resources** a container needs.
+
+- Used by the **Kubernetes scheduler**
+- Determines **which worker node** can host the Pod
+- Ensures the Pod gets at least this amount of resources
+
+**Example**
+- CPU request: 500m → Pod needs at least 0.5 CPU
+- Memory request: 256Mi → Pod needs at least 256MB RAM
+
+---
+
+### Limits
+Limits define the **maximum resources** a container can use.
+
+- Enforced by the **container runtime**
+
+**Behavior**
+- CPU limit → Enforced by **throttling**
+- Memory limit → Exceeding causes **OOMKilled (container terminated)**
+
+---
+
+## Resource Flow
+
+Pod
+└── Worker Node
+├── Requests
+│ ├── CPU
+│ └── Memory
+└── Limits
+├── CPU
+└── Memory
+
+---
+
+## Scenario
+> This example demonstrates what happens when a container **exceeds its memory limit** in Kubernetes.
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pod-stress
+  labels:
+    env: dev
+spec:
+  containers:
+    - name: my-cont-stress
+      image: polinux/stress
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      command: ["stress", "--vm", "1", "--vm-bytes", "155M"]
+      resources:
+        requests:
+          cpu: "150m"
+          memory: 100Mi
+        limits:
+          cpu: "200m"
+          memory: 150Mi
+```
+
+---
+
+## Pod Status (Tabular View)
+
+| NAME        | READY | STATUS             | RESTARTS | AGE |
+|-------------|-------|--------------------|----------|-----|
+| pod-stress  | 0/1   | OOMKilled          | 1        | 5s  |
+| pod-stress  | 0/1   | CrashLoopBackOff   | 1        | 14s |
+| pod-stress  | 0/1   | OOMKilled          | 2        | 15s |
+
+---
+
+# Kubernetes Resource Limits – Successful Run Example
+
+## Scenario
+> This example shows a container running **within its memory limits**, so it remains stable and healthy.
+
+---
+
+## Pod Configuration
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata: 
+  name: pod-stress
+  labels:
+    env: dev
+spec:
+  containers:
+    - name: my-cont-stress
+      image: polinux/stress
+      ports:
+        - containerPort: 80
+          protocol: TCP
+      command: ["stress", "--vm", "1", "--vm-bytes", "125M"]
+      resources:
+        requests:
+          cpu: "150m"
+          memory: 100Mi
+        limits:
+          cpu: "200m"
+          memory: 150Mi
+```
+
+---
+
+## Pod Status (Tabular View)
+
+| NAME        | READY | STATUS  | RESTARTS | AGE |
+|-------------|-------|---------|----------|-----|
+| pod-stress  | 1/1   | Running | 0        | 3s  |
+
+---
+
+### 
+
+![Kubernates-resource-requests-limits](./images/Resource-requests-limits.png)
 
 ---

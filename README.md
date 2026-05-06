@@ -3982,18 +3982,30 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A[Pod (eth0)]
-    B[veth]
-    C[Bridge (cni0)]
-    D[Node eth0]
-    E[Network (via CNI)]
-    F[Target Node eth0]
-    G[Bridge]
-    H[veth]
-    I[Pod (eth0)]
-    J[Container]
 
-    A --> B --> C --> D --> E --> F --> G --> H --> I --> J
+    subgraph Source_Node
+        A[Container]
+        B[Pod eth0]
+        C[veth]
+        D[Bridge cni0]
+        E[Node eth0]
+        A --> B --> C --> D --> E
+    end
+
+    subgraph Network
+        F[Network via CNI]
+    end
+
+    subgraph Target_Node
+        G[Node eth0]
+        H[Bridge cni0]
+        I[veth]
+        J[Pod eth0]
+        K[Container]
+        G --> H --> I --> J --> K
+    end
+
+    E --> F --> G
 ```
 
 ### Explanation

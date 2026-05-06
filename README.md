@@ -3958,13 +3958,14 @@ This document illustrates the correct network communication flow in Kubernetes f
 ## Pods on (Same Node)
 
 ```mermaid
-flowchart LR
+flowchart TD
 
     %% Source Pod
     subgraph Source_Pod
         A[Container]
         B[Pod eth0]
         C[veth Pod End]
+        A --> B --> C
     end
 
     %% Host Network
@@ -3972,6 +3973,7 @@ flowchart LR
         D[veth Host End]
         E[Bridge cni0]
         F[veth Host End]
+        D --> E --> F
     end
 
     %% Target Pod
@@ -3979,25 +3981,27 @@ flowchart LR
         G[veth Pod End]
         H[Pod eth0]
         I[Container]
+        G --> H --> I
     end
 
-    %% Flow
-    A --> B --> C --> D --> E --> F --> G --> H --> I
+    %% Flow between groups
+    C --> D
+    F --> G
 
-    %% Styling (high contrast)
-    style A fill:#ffffff,stroke:#1E88E5,stroke-width:2px,color:#000000
-    style I fill:#ffffff,stroke:#1E88E5,stroke-width:2px,color:#000000
+    %% Styling (clean + readable colors)
+    style A fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000000
+    style I fill:#E3F2FD,stroke:#1565C0,stroke-width:2px,color:#000000
 
-    style B fill:#ffffff,stroke:#43A047,stroke-width:2px,color:#000000
-    style H fill:#ffffff,stroke:#43A047,stroke-width:2px,color:#000000
+    style B fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000000
+    style H fill:#E8F5E9,stroke:#2E7D32,stroke-width:2px,color:#000000
 
-    style C fill:#ffffff,stroke:#FB8C00,stroke-width:2px,color:#000000
-    style G fill:#ffffff,stroke:#FB8C00,stroke-width:2px,color:#000000
+    style C fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000000
+    style G fill:#FFF3E0,stroke:#EF6C00,stroke-width:2px,color:#000000
 
-    style D fill:#ffffff,stroke:#8E24AA,stroke-width:2px,color:#000000
-    style F fill:#ffffff,stroke:#8E24AA,stroke-width:2px,color:#000000
+    style D fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px,color:#000000
+    style F fill:#F3E5F5,stroke:#6A1B9A,stroke-width:2px,color:#000000
 
-    style E fill:#ffffff,stroke:#00897B,stroke-width:2px,color:#000000
+    style E fill:#E0F2F1,stroke:#00695C,stroke-width:2px,color:#000000
 ```
 
 ### Explanation

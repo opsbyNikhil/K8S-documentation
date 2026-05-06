@@ -343,9 +343,6 @@
   - [Pods on (Same Node)](#pods-on-same-node)
     - [Explanation](#explanation-1)
   - [Pods on (Different Node) (Mermaid)](#pods-on-different-node-mermaid)
-    - [Explanation](#explanation-2)
-- [Kubernetes Networking Models](#kubernetes-networking-models)
-  - [1. Container → Container (Same Pod)](#1-container--container-same-pod)
   - [2. Pod → Pod Networking](#2-pod--pod-networking)
     - [Same Node](#same-node)
     - [Different Nodes](#different-nodes)
@@ -3980,6 +3977,7 @@ flowchart LR
 
 ## Pods on (Different Node) (Mermaid)
 
+``mermaid
 flowchart LR
     A[Pod (eth0)]
     B[veth]
@@ -3993,7 +3991,7 @@ flowchart LR
     J[Container]
 
     A --> B --> C --> D --> E --> F --> G --> H --> I --> J
-
+```
 
 ### Explanation
 

@@ -353,6 +353,7 @@
     - [Pod → Service](#pod--service)
     - [Service → Pod](#service--pod)
   - [4. Internet → Service](#4-internet--service)
+  - [Kubernates Networking Models Types](#kubernates-networking-models-types)
 
 ---
 
@@ -4167,6 +4168,8 @@ localhost
 - Pod receives traffic through normal Pod networking flow
 
 ---
+
+## Kubernates Networking Models Types 
 
 ![kubernates-networking-types](./images/k8s-networking-models-types.png)
 

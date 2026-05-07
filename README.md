@@ -300,6 +300,23 @@
   - [Resource Flow](#resource-flow)
   - [Scenario](#scenario)
   - [Pod Status (Tabular View)](#pod-status-tabular-view)
+- [Kubernetes OOMKilled Troubleshooting Guide](#kubernetes-oomkilled-troubleshooting-guide)
+  - [1. Check Pod Status](#1-check-pod-status)
+  - [2. Describe the Pod](#2-describe-the-pod)
+    - [Important Sections to Check](#important-sections-to-check)
+  - [3. Check Container Logs](#3-check-container-logs)
+  - [4. Verify Resource Limits in YAML](#4-verify-resource-limits-in-yaml)
+    - [Example Resource Configuration](#example-resource-configuration)
+  - [5. Login Into the Pod (If Still Running)](#5-login-into-the-pod-if-still-running)
+    - [Useful Commands](#useful-commands)
+  - [6. Root Cause Analysis](#6-root-cause-analysis)
+  - [7. Fix the Issue](#7-fix-the-issue)
+    - [Option 1: Increase Memory Limit](#option-1-increase-memory-limit)
+    - [Option 2: Reduce Application Memory Usage](#option-2-reduce-application-memory-usage)
+    - [Option 3: Tune Application Settings](#option-3-tune-application-settings)
+- [Summary](#summary-7)
+    - [Main Troubleshooting Flow](#main-troubleshooting-flow)
+- [Kubernates-OOMKill-Troubleshoot-Steps](#kubernates-oomkill-troubleshoot-steps)
 - [Kubernetes Resource Limits – Successful Run Example](#kubernetes-resource-limits--successful-run-example)
   - [Scenario](#scenario-1)
   - [Pod Configuration](#pod-configuration)
@@ -354,6 +371,40 @@
     - [Service → Pod](#service--pod)
   - [4. Internet → Service](#4-internet--service)
   - [Kubernates Networking Models Types](#kubernates-networking-models-types)
+- [Kubernetes Selectors](#kubernetes-selectors)
+- [Types of Selectors](#types-of-selectors)
+- [1. Match Labels (Equality-Based Selectors)](#1-match-labels-equality-based-selectors)
+  - [Definition](#definition-3)
+  - [i. Equality-Based Selector](#i-equality-based-selector)
+    - [Syntax](#syntax)
+    - [Explanation](#explanation-3)
+    - [Example Pod Label](#example-pod-label)
+  - [ii. Not-Equal (Inequality Selector)](#ii-not-equal-inequality-selector)
+    - [Syntax](#syntax-1)
+    - [Explanation](#explanation-4)
+- [2. Match Expressions](#2-match-expressions)
+  - [Definition](#definition-4)
+    - [Syntax](#syntax-2)
+  - [1. In Operator](#1-in-operator)
+  - [Example: In Operator](#example-in-operator)
+    - [Syntax](#syntax-3)
+    - [Explanation](#explanation-5)
+  - [2. NotIn Operator](#2-notin-operator)
+  - [Example: NotIn Operator](#example-notin-operator)
+    - [Syntax](#syntax-4)
+    - [Explanation](#explanation-6)
+  - [3. Exists Operator](#3-exists-operator)
+  - [Example: Exists Operator](#example-exists-operator)
+    - [Syntax](#syntax-5)
+    - [Explanation](#explanation-7)
+  - [4. DoesNotExist Operator](#4-doesnotexist-operator)
+  - [Example: DoesNotExist Operator](#example-doesnotexist-operator)
+    - [Syntax](#syntax-6)
+    - [Explanation](#explanation-8)
+- [Summary](#summary-8)
+  - [Match Labels](#match-labels)
+  - [Match Expressions](#match-expressions)
+- [Common Operators](#common-operators)
 
 ---
 
@@ -3563,6 +3614,189 @@ spec:
 
 ---
 
+# Kubernetes OOMKilled Troubleshooting Guide
+
+## 1. Check Pod Status
+
+First, check the pod status:
+
+```bash
+kubectl get pods
+```
+
+Continuous watch mode:
+
+```bash
+kubectl get pods -w
+```
+
+If the restart count is increasing:
+
+```text
+RESTARTS > 0
+```
+
+then the container may be crashing repeatedly.
+
+---
+
+## 2. Describe the Pod
+
+Inspect detailed pod information:
+
+```bash
+kubectl describe pod my-resource-pod
+```
+
+### Important Sections to Check
+
+```text
+Last State:
+  Reason: OOMKilled
+  Exit Code: 137
+```
+
+This confirms the container was terminated because of memory exhaustion.
+
+Also verify:
+
+- Events
+- Resource limits
+- Restart count
+
+---
+
+## 3. Check Container Logs
+
+View current container logs:
+
+```bash
+kubectl logs my-resource-pod
+```
+
+View logs from the previously crashed container:
+
+```bash
+kubectl logs my-resource-pod --previous
+```
+
+> `--previous` is very important because the container may have already restarted.
+
+---
+
+## 4. Verify Resource Limits in YAML
+
+Inspect the pod YAML:
+
+```bash
+kubectl get pod my-resource-pod -o yaml
+```
+
+Or check the Deployment YAML directly.
+
+### Example Resource Configuration
+
+```yaml
+resources:
+  requests:
+    memory: 100Mi
+  limits:
+    memory: 200Mi
+```
+
+Compare these values with the application's actual memory usage.
+
+---
+
+## 5. Login Into the Pod (If Still Running)
+
+Access the running container:
+
+```bash
+kubectl exec -it my-resource-pod -- sh
+```
+
+Check:
+
+- Running processes
+- Memory usage
+- Application behavior
+
+### Useful Commands
+
+```bash
+ps aux
+free -m
+top
+```
+
+---
+
+## 6. Root Cause Analysis
+
+Example issue:
+
+```bash
+stress --vm-bytes 255M
+```
+
+The application tries allocating more memory than the configured limit:
+
+```yaml
+limits:
+  memory: 200Mi
+```
+
+As a result, the Linux OOM Killer terminates the container.
+
+---
+
+## 7. Fix the Issue
+
+### Option 1: Increase Memory Limit
+
+```yaml
+limits:
+  memory: 512Mi
+```
+
+### Option 2: Reduce Application Memory Usage
+
+Optimize the application to consume less memory.
+
+### Option 3: Tune Application Settings
+
+Depending on the application type, tune:
+
+- JVM heap size
+- Cache configuration
+- Worker processes
+- Thread count
+
+---
+
+# Summary
+
+OOMKilled occurs when a container exceeds its memory limit configured in Kubernetes.
+
+### Main Troubleshooting Flow
+
+1. Check pod restart status
+2. Describe the pod
+3. Inspect logs
+4. Verify memory limits
+5. Access container for live debugging
+6. Identify root cause
+7. Increase memory or optimize application
+
+--- 
+
+# Kubernates-OOMKill-Troubleshoot-Steps
+
+![kubernates-oomkill-troubleshoot-steps](./images/k8s-oomkill-troublshoot-steps-flow.png)
+
+---
+
 # Kubernetes Resource Limits – Successful Run Example
 
 ## Scenario
@@ -4174,3 +4408,262 @@ localhost
 ![kubernates-networking-types](./images/k8s-networking-models-types.png)
 
 ---
+
+# Kubernetes Selectors
+
+Selectors in Kubernetes are used to identify and match resources like Pods based on labels.
+
+They are mainly used by:
+
+- Deployments
+- ReplicaSets
+- Services
+- DaemonSets
+
+Selectors help Kubernetes controllers target specific Pods.
+
+---
+
+# Types of Selectors
+
+Kubernetes supports two types of selectors:
+
+1. Match Labels
+2. Match Expressions
+
+---
+
+# 1. Match Labels (Equality-Based Selectors)
+
+## Definition
+
+Match labels use simple key-value pairs and support:
+
+- Equality (`=`)
+- Inequality (`!=`)
+
+---
+
+## i. Equality-Based Selector
+
+### Syntax
+
+```yaml
+matchLabels:
+  app: zomato
+```
+
+### Explanation
+
+This selects all Pods where:
+
+```text
+app = zomato
+```
+
+### Example Pod Label
+
+```yaml
+labels:
+  app: zomato
+```
+
+---
+
+## ii. Not-Equal (Inequality Selector)
+
+### Syntax
+
+```yaml
+app != zomato
+```
+
+### Explanation
+
+This selects all Pods where:
+
+```text
+app is not equal to zomato
+```
+
+---
+
+# 2. Match Expressions
+
+## Definition
+
+Match expressions provide advanced label selection using operators.
+
+### Syntax
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: In
+    values:
+      - zomato
+      - uber
+
+```
+
+Supported operators:
+
+- In
+- NotIn
+- Exists
+- DoesNotExist
+
+---
+
+
+## 1. In Operator
+
+- > Selects resources where the key has one of the specified values.
+
+## Example: In Operator
+
+### Syntax
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: In
+    values:
+      - zomato
+      - swiggy
+```
+
+### Explanation
+
+This selects Pods where:
+
+```text
+app = zomato OR app = swiggy
+```
+
+---
+
+## 2. NotIn Operator
+
+- > Selects resources where the key does not have the specified values.
+
+## Example: NotIn Operator
+
+### Syntax
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: NotIn
+    values:
+      - zomato
+```
+
+### Explanation
+
+This selects Pods where:
+
+```text
+app is not zomato
+```
+
+---
+
+## 3. Exists Operator
+
+## Example: Exists Operator
+
+### Syntax
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: Exists
+```
+
+### Explanation
+
+This selects Pods that contain the label:
+
+```text
+app
+```
+
+regardless of its value.
+
+---
+
+## 4. DoesNotExist Operator
+
+## Example: DoesNotExist Operator
+
+### Syntax
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: DoesNotExist
+```
+
+### Explanation
+
+This selects Pods that do not contain the label:
+
+```text
+app
+```
+
+---
+
+# Summary
+
+## Match Labels
+
+Used for:
+
+- Simple equality checks
+- Simple inequality checks
+
+Example:
+
+```yaml
+matchLabels:
+  app: zomato
+```
+
+---
+
+## Match Expressions
+
+Used for:
+
+- Advanced filtering
+- Multiple values
+- Conditional matching
+
+Example:
+
+```yaml
+matchExpressions:
+  - key: app
+    operator: In
+    values:
+      - zomato
+      - swiggy
+```
+
+---
+
+# Common Operators
+
+| Operator | Meaning |
+|-----------|---------|
+| In | Value exists in list |
+| NotIn | Value does not exist in list |
+| Exists | Label key exists |
+| DoesNotExist | Label key does not exist |
+| = | Equal |
+| != | Not equal |
+
+---
+

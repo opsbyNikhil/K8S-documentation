@@ -514,6 +514,169 @@
 - [Step 12: Verify Resources](#step-12-verify-resources)
 - [Step 13: Access Application](#step-13-access-application)
 - [Features Used in This Deployment](#features-used-in-this-deployment)
+- [Kubernetes Deployment Setup Using eksctl](#kubernetes-deployment-setup-using-eksctl-1)
+- [Kubernetes Namespaces](#kubernetes-namespaces-1)
+  - [Definition](#definition-5)
+- [Why Namespaces are Used](#why-namespaces-are-used)
+  - [Example Namespaces](#example-namespaces)
+- [To Check the Namespaces](#to-check-the-namespaces)
+  - [Output](#output)
+- [1. Default Namespace](#1-default-namespace)
+  - [Definition](#definition-6)
+  - [Purpose](#purpose)
+  - [Example](#example-6)
+- [2. kube-system Namespace](#2-kube-system-namespace)
+  - [Definition](#definition-7)
+  - [Purpose](#purpose-1)
+  - [Components Present](#components-present)
+  - [Example](#example-7)
+  - [Interview Point](#interview-point)
+- [3. kube-public Namespace](#3-kube-public-namespace)
+  - [Definition](#definition-8)
+  - [Purpose](#purpose-2)
+  - [Example](#example-8)
+  - [Interview Point](#interview-point-1)
+- [4. kube-node-lease Namespace](#4-kube-node-lease-namespace)
+  - [Definition](#definition-9)
+  - [Purpose](#purpose-3)
+  - [Interview Point](#interview-point-2)
+- [5. Custom Namespace](#5-custom-namespace)
+  - [Definition](#definition-10)
+  - [Purpose](#purpose-4)
+  - [Example](#example-9)
+- [To Check Deployment](#to-check-deployment)
+- [Kubernetes Namespace Integration with EKSCTL Deployment and Rollout](#kubernetes-namespace-integration-with-eksctl-deployment-and-rollout)
+- [Step 1: Create EC2 Instance and Login](#step-1-create-ec2-instance-and-login)
+- [Step 2: Update Packages](#step-2-update-packages)
+- [Step 3: Install AWS CLI](#step-3-install-aws-cli-3)
+- [Step 4: Install eksctl](#step-4-install-eksctl)
+- [Step 5: Install kubectl](#step-5-install-kubectl)
+- [Step 6: Create EKS Cluster](#step-6-create-eks-cluster-3)
+- [Step 7: Create Deployment and Service YAML Files](#step-7-create-deployment-and-service-yaml-files)
+  - [Pod.yaml](#podyaml-1)
+  - [service.yaml](#serviceyaml)
+- [Step 8: Apply YAML Files](#step-8-apply-yaml-files)
+  - [Error](#error)
+- [Step 9: Create Namespace](#step-9-create-namespace-1)
+  - [Output](#output-1)
+- [Step 10: Verify Namespace](#step-10-verify-namespace)
+  - [Output](#output-2)
+- [Step 11: Apply YAML Files Again](#step-11-apply-yaml-files-again)
+  - [Output](#output-3)
+- [Step 12: Switch to Namespace](#step-12-switch-to-namespace)
+  - [Output](#output-4)
+- [Step 13: Check Services](#step-13-check-services)
+- [Step 14: Check Pods](#step-14-check-pods)
+  - [Output](#output-5)
+- [Step 15: Check All Resources](#step-15-check-all-resources)
+  - [Output](#output-6)
+- [Step 16: Access the Application](#step-16-access-the-application)
+- [Step 17: Perform Rollout Update](#step-17-perform-rollout-update)
+  - [Syntax](#syntax-7)
+- [Step 18: Rollback Deployment](#step-18-rollback-deployment)
+- [Step 19: Check Rollout Status](#step-19-check-rollout-status)
+  - [Method 1](#method-1)
+  - [Method 2](#method-2)
+- [Step 20: Check Rollout History](#step-20-check-rollout-history)
+- [Important Interview Points](#important-interview-points)
+- [Summary](#summary-9)
+- [Kubernetes Namespace Integration with EKSCTL Deployment and Rollout](#kubernetes-namespace-integration-with-eksctl-deployment-and-rollout-1)
+- [Kubernetes Annotations](#kubernetes-annotations-1)
+  - [Definition](#definition-11)
+- [Core Concept](#core-concept-2)
+- [Common Uses of Annotations](#common-uses-of-annotations)
+- [Implementation of Annotation Using Deployment](#implementation-of-annotation-using-deployment)
+  - [Step 1: Create Deployment and Service YAML Files](#step-1-create-deployment-and-service-yaml-files)
+- [pod.yaml](#podyaml-2)
+- [service.yaml](#serviceyaml-1)
+- [Step 2: Apply YAML Files](#step-2-apply-yaml-files)
+  - [Error](#error-1)
+- [Step 3: Create Namespace](#step-3-create-namespace)
+  - [Output](#output-7)
+- [Step 4: Verify Namespace](#step-4-verify-namespace)
+  - [Output](#output-8)
+- [Step 5: Apply YAML Files Again](#step-5-apply-yaml-files-again)
+  - [Output](#output-9)
+- [Step 6: Switch to Namespace](#step-6-switch-to-namespace)
+  - [Output](#output-10)
+- [Step 7: Check Service](#step-7-check-service)
+- [Step 8: Check Pods](#step-8-check-pods)
+  - [Output](#output-11)
+- [Step 9: Check All Resources](#step-9-check-all-resources)
+  - [Output](#output-12)
+- [Step 10: Perform Rollout Update](#step-10-perform-rollout-update)
+  - [Syntax](#syntax-8)
+- [Step 11: Check Rollout Status](#step-11-check-rollout-status)
+  - [Method 1](#method-1-1)
+  - [Method 2](#method-2-1)
+- [Step 12: Check Rollout History](#step-12-check-rollout-history)
+- [Step 13: Update Annotation](#step-13-update-annotation)
+  - [Method 1](#method-1-2)
+  - [Method 2](#method-2-2)
+- [Step 14: Verify Annotation History](#step-14-verify-annotation-history)
+  - [Method 1](#method-1-3)
+  - [Method 2](#method-2-3)
+  - [Output](#output-13)
+- [Step 15: Rollback Deployment](#step-15-rollback-deployment)
+  - [Method 1](#method-1-4)
+  - [Method 2](#method-2-4)
+- [Step 16: Verify Rollback History](#step-16-verify-rollback-history)
+  - [Output](#output-14)
+- [Important Interview Points](#important-interview-points-1)
+- [Common Annotation Commands](#common-annotation-commands)
+  - [Add Annotation](#add-annotation)
+  - [View Annotations](#view-annotations)
+  - [Remove Annotation](#remove-annotation)
+- [Summary](#summary-10)
+- [Implementation of Annotation Using Deployment](#implementation-of-annotation-using-deployment-1)
+- [Kubernetes Stateful vs Stateless Applications](#kubernetes-stateful-vs-stateless-applications)
+- [Stateless Application](#stateless-application)
+  - [Definition](#definition-12)
+- [Stateless Application Architecture](#stateless-application-architecture)
+- [Characteristics of Stateless Applications](#characteristics-of-stateless-applications)
+- [Examples of Stateless Applications](#examples-of-stateless-applications)
+- [Kubernetes Resource Used](#kubernetes-resource-used)
+  - [Deployment](#deployment)
+- [Stateful Application](#stateful-application)
+  - [Definition](#definition-13)
+- [Characteristics of Stateful Applications](#characteristics-of-stateful-applications)
+- [Examples of Stateful Applications](#examples-of-stateful-applications)
+- [Kubernetes Resource Used](#kubernetes-resource-used-1)
+  - [StatefulSet](#statefulset)
+- [StatefulSet Implementation in Kubernetes](#statefulset-implementation-in-kubernetes)
+- [pod.yaml](#podyaml-3)
+- [service.yaml](#serviceyaml-2)
+- [Implementation of StatefulSet and Login into Database](#implementation-of-statefulset-and-login-into-database)
+- [Step 1: Apply YAML Files](#step-1-apply-yaml-files)
+  - [Error](#error-2)
+- [Step 2: Create Namespace](#step-2-create-namespace)
+- [Step 3: Apply YAML Files Again](#step-3-apply-yaml-files-again)
+- [Step 4: Switch Namespace](#step-4-switch-namespace)
+- [Step 5: Verify StatefulSet Resources](#step-5-verify-statefulset-resources)
+  - [Output](#output-15)
+- [Step 6: Login into MySQL Pod](#step-6-login-into-mysql-pod)
+  - [Method 1](#method-1-5)
+  - [Method 2](#method-2-5)
+- [Step 7: Move to MySQL Directory](#step-7-move-to-mysql-directory)
+- [Step 8: Login to MySQL](#step-8-login-to-mysql)
+  - [Generic Syntax](#generic-syntax)
+- [Step 9: Verify Databases](#step-9-verify-databases)
+  - [Output](#output-16)
+- [Step 10: Use Database](#step-10-use-database)
+- [Step 11: Verify Tables](#step-11-verify-tables)
+- [Step 12: Create Table](#step-12-create-table)
+- [Step 13: Verify Table Creation](#step-13-verify-table-creation)
+- [Step 14: Insert Data](#step-14-insert-data)
+- [Step 15: Describe Table](#step-15-describe-table)
+- [Step 16: Verify Data](#step-16-verify-data)
+- [Step 17: Insert Multiple Records](#step-17-insert-multiple-records)
+- [Step 18: Verify Final Records](#step-18-verify-final-records)
+  - [Output](#output-17)
+- [Important Interview Points](#important-interview-points-2)
+- [Difference Between Stateless and Stateful Applications](#difference-between-stateless-and-stateful-applications)
+- [Key Kubernetes Concepts Used](#key-kubernetes-concepts-used)
+- [Summary](#summary-11)
+- [Kubernates statefullset](#kubernates-statefullset)
 
 ---
 
@@ -1852,30 +2015,29 @@ Init containers are used to **prepare the environment** before the main applicat
 apiVersion: v1
 kind: Pod
 metadata:
-  name: init-cont
+  name: my-init-pod
 spec:
-  initContainers:
-    - name: init-co
-      image: alpine:latest
-      command:
-        [
-          "sh",
-          "-c",
-          "echo '<h1> This is my app </h1>' >> /usr/share/nginx/html/index.html",
-        ]
-      volumeMounts:
-        - name: init-data
-          mountPath: /usr/share/nginx/html
-
   containers:
-    - name: main-app
-      image: nginx
+    - name: my-cont
+      image: nginx:1.29
+      ports:
+        - containerPort: 80
+          protocol: TCP
       volumeMounts:
-        - name: init-data
+        - name: init-vol
           mountPath: /usr/share/nginx/html
-
+  initContainers:
+    - name: my-init-cont
+      image: busybox
+      command:
+        - sh
+        - c
+        - echo "<h1>My init cont</h1>" > /usr/share/nginx/html/index.html
+      volumeMounts:
+        - name: init-vol
+          mountPath: /usr/share/nginx/html
   volumes:
-    - name: init-data
+    - name: init-vol
       emptyDir: {}
 ```
 
@@ -6026,6 +6188,7 @@ aws configure
 ```
 
 Provide:
+
 - AWS Access Key
 - AWS Secret Key
 - Region Name
@@ -6070,6 +6233,7 @@ eksctl create cluster \
 ```
 
 This command creates:
+
 - EKS Cluster
 - 2 Worker Nodes
 - Networking resources automatically
@@ -6233,6 +6397,7 @@ kubectl get all
 # Step 13: Access Application
 
 After a few minutes:
+
 - AWS creates a LoadBalancer
 - External IP/DNS is generated
 
@@ -6243,10 +6408,12 @@ kubectl get svc
 ```
 
 Copy the:
+
 - EXTERNAL-IP
 - LoadBalancer DNS
 
 Access application from browser using:
+
 ```text
 http://<LoadBalancer-IP>
 ```
@@ -6265,3 +6432,1450 @@ http://<LoadBalancer-IP>
 - Readiness Probe
 - Match Expressions
 - Zero-Downtime Deployment
+
+---
+
+# Kubernetes Deployment Setup Using eksctl
+
+[Kubernetes Deployment Setup Using eksctl](./images/Kubernetes-deployment-setup-using-eksctl.png)
+
+---
+
+# Kubernetes Namespaces
+
+## Definition
+
+A **Namespace** in Kubernetes is a logical isolation boundary used to organize and separate resources within a cluster.
+
+It helps divide a single Kubernetes cluster into multiple virtual environments so that teams, applications, or environments can work independently without affecting each other.
+
+---
+
+# Why Namespaces are Used
+
+Namespaces are mainly used for:
+
+- Resource isolation
+- Environment separation
+- Access control
+- Resource management
+- Multi-team collaboration
+
+## Example Namespaces
+
+- dev
+- qa
+- uat
+- prod
+
+---
+
+# To Check the Namespaces
+
+```bash
+kubectl get ns
+```
+
+## Output
+
+```bash
+NAME                STATUS   AGE
+default             Active   13m
+kube-node-lease     Active   13m
+kube-public         Active   13m
+kube-system         Active   13m
+```
+
+---
+
+# 1. Default Namespace
+
+## Definition
+
+The `default` namespace is the namespace Kubernetes uses automatically when no namespace is specified by the user.
+
+## Purpose
+
+Used for general workloads and beginner deployments.
+
+## Example
+
+```bash
+kubectl get pods
+```
+
+If no namespace is mentioned, Kubernetes checks inside the `default` namespace.
+
+---
+
+# 2. kube-system Namespace
+
+## Definition
+
+`kube-system` is a system namespace used by Kubernetes to run internal cluster components.
+
+## Purpose
+
+Stores Kubernetes control plane and networking components.
+
+## Components Present
+
+- CoreDNS
+- kube-proxy
+- Metrics Server
+- CNI Plugins
+
+## Example
+
+```bash
+kubectl get pods -n kube-system
+```
+
+## Interview Point
+
+> "kube-system contains all critical Kubernetes system services."
+
+---
+
+# 3. kube-public Namespace
+
+## Definition
+
+`kube-public` is a publicly readable namespace accessible by all users.
+
+## Purpose
+
+Used for publicly accessible cluster information.
+
+## Example
+
+Usually contains cluster-related public configs.
+
+## Interview Point
+
+> "kube-public is readable by all authenticated and unauthenticated users."
+
+---
+
+# 4. kube-node-lease Namespace
+
+## Definition
+
+`kube-node-lease` stores node lease objects.
+
+## Purpose
+
+Used for node heartbeat management to improve cluster scalability and performance.
+
+## Interview Point
+
+> "kube-node-lease helps Kubernetes track node availability efficiently."
+
+---
+
+# 5. Custom Namespace
+
+## Definition
+
+Namespaces created by users for application or environment isolation.
+
+## Purpose
+
+Used to separate:
+
+- dev
+- qa
+- uat
+- prod
+- team-based applications
+
+## Example
+
+```bash
+kubectl create namespace dev
+```
+
+---
+
+# To Check Deployment
+
+```bash
+kubectl get deployment
+```
+
+---
+
+# Kubernetes Namespace Integration with EKSCTL Deployment and Rollout
+
+---
+
+# Step 1: Create EC2 Instance and Login
+
+```bash
+ssh ubuntu@<Public-IP>
+```
+
+---
+
+# Step 2: Update Packages
+
+```bash
+sudo apt update
+sudo apt install unzip -y
+```
+
+---
+
+# Step 3: Install AWS CLI
+
+Install AWS CLI from the official documentation.
+
+Then configure AWS credentials:
+
+```bash
+aws configure
+```
+
+Provide:
+
+- AWS Access Key
+- AWS Secret Key
+- Region
+- Output Format
+
+---
+
+# Step 4: Install eksctl
+
+Install `eksctl` from the official documentation.
+
+---
+
+# Step 5: Install kubectl
+
+Install `kubectl` from the official documentation.
+
+---
+
+# Step 6: Create EKS Cluster
+
+```bash
+eksctl create cluster mycluster \
+--region ap-south-1 \
+--node-type m7i-flex.large \
+--nodes 1
+```
+
+---
+
+# Step 7: Create Deployment and Service YAML Files
+
+## Pod.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pod-dep
+  namespace: dev
+
+spec:
+  minReadySeconds: 5
+  replicas: 5
+
+  selector:
+    matchLabels:
+      app: red-app
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  template:
+    metadata:
+      name: my-red-pod
+
+      labels:
+        app: red-app
+
+    spec:
+      containers:
+        - name: red-con
+          image: opsbynikhil/redpage:REDPAGE
+
+          ports:
+            - containerPort: 80
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+
+            successThreshold: 1
+            failureThreshold: 5
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 64Mi
+
+            limits:
+              cpu: 450m
+              memory: 128Mi
+```
+
+---
+
+## service.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: svc-deployment
+  namespace: dev
+
+spec:
+  type: NodePort
+
+  selector:
+    app: red-app
+
+  ports:
+    - name: node
+      port: 80
+      nodePort: 32000
+```
+
+---
+
+# Step 8: Apply YAML Files
+
+```bash
+kubectl apply -f .
+```
+
+## Error
+
+```bash
+error when creating "p.yaml": namespaces "dev" not found
+error when creating "s.yaml": namespaces "dev" not found
+```
+
+---
+
+# Step 9: Create Namespace
+
+```bash
+kubectl create namespace dev
+```
+
+## Output
+
+```bash
+namespace/dev created
+```
+
+---
+
+# Step 10: Verify Namespace
+
+```bash
+kubectl get ns
+```
+
+## Output
+
+```bash
+NAME                STATUS   AGE
+default             Active   29m
+dev                 Active   10s
+kube-node-lease     Active   29m
+kube-public         Active   29m
+kube-system         Active   29m
+```
+
+---
+
+# Step 11: Apply YAML Files Again
+
+```bash
+kubectl apply -f .
+```
+
+## Output
+
+```bash
+deployment.apps/pod-dep created
+service/svc-deployment created
+```
+
+---
+
+# Step 12: Switch to Namespace
+
+```bash
+kubectl config set-context --current --namespace=dev
+```
+
+## Output
+
+```bash
+Context "My_AWS_02_User@mycluster.ap-south-1.eksctl.io" modified.
+```
+
+---
+
+# Step 13: Check Services
+
+```bash
+kubectl get svc
+```
+
+---
+
+# Step 14: Check Pods
+
+```bash
+kubectl get po
+```
+
+## Output
+
+```bash
+NAME                        READY   STATUS    RESTARTS   AGE
+pod-dep-d789898f9-62fcb    1/1     Running   0          7m12s
+pod-dep-d789898f9-8fjvh    1/1     Running   0          7m12s
+pod-dep-d789898f9-fmd7g    1/1     Running   0          7m12s
+pod-dep-d789898f9-wbm59    1/1     Running   0          7m12s
+pod-dep-d789898f9-znsh7    1/1     Running   0          7m12s
+```
+
+---
+
+# Step 15: Check All Resources
+
+```bash
+kubectl get all
+```
+
+## Output
+
+```bash
+NAME                             READY   STATUS    RESTARTS   AGE
+pod/pod-dep-d789898f9-62fcb     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-8fjvh     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-fmd7g     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-wbm59     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-znsh7     1/1     Running   0          7m27s
+
+NAME                          TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
+service/svc-deployment        NodePort   10.100.175.36   <none>        80:31234/TCP   7m27s
+
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/pod-dep     5/5     5            5           7m27s
+
+NAME                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/pod-dep-d789898f9     5         5         5       7m27s
+```
+
+---
+
+# Step 16: Access the Application
+
+```bash
+http://<Public-IP>:<Port>
+```
+
+You will see the **Red Page** application.
+
+---
+
+# Step 17: Perform Rollout Update
+
+To move from the Red Page to the Yellow/Green Page:
+
+```bash
+kubectl set image deployments.apps/pod-dep red-con=opsbynikhil/yellowpage:YELLOWPAGE
+```
+
+## Syntax
+
+```bash
+kubectl set image <deployment-name> <container-name>=<image-name>
+```
+
+---
+
+# Step 18: Rollback Deployment
+
+```bash
+kubectl rollout undo deployment.apps/pod-dep
+```
+
+---
+
+# Step 19: Check Rollout Status
+
+## Method 1
+
+```bash
+kubectl rollout status deployment.apps/pod-dep
+```
+
+## Method 2
+
+```bash
+kubectl rollout status deployment pod-dep -n dev
+```
+
+---
+
+# Step 20: Check Rollout History
+
+```bash
+kubectl rollout history deployment.apps/pod-dep
+```
+
+---
+
+# Important Interview Points
+
+- Namespace provides logical isolation in Kubernetes.
+- `default` namespace is used automatically when no namespace is specified.
+- `kube-system` contains Kubernetes internal components.
+- `kube-public` is publicly readable.
+- `kube-node-lease` manages node heartbeat information.
+- RollingUpdate strategy updates pods gradually without downtime.
+- `kubectl rollout undo` helps rollback failed deployments.
+- `kubectl rollout history` shows deployment revision history.
+
+---
+
+# Summary
+
+This project demonstrates:
+
+- Kubernetes Namespaces
+- EKS Cluster Creation using eksctl
+- Deployment Creation
+- Service Exposure using NodePort
+- Namespace Isolation
+- Rollout Update Strategy
+- Rollback Operations
+- Kubernetes Resource Verification
+- Production-style Deployment Workflow
+
+---
+
+# Kubernetes Namespace Integration with EKSCTL Deployment and Rollout
+
+[Kubernetes Namespace Integration with EKSCTL Deployment and Rollout](./images/deployement-rollingupdate-namespace.png)
+
+---
+
+# Kubernetes Annotations
+
+## Definition
+
+Annotations in Kubernetes are key–value metadata attached to objects to store non-identifying information.
+
+Unlike labels, annotations are not used for object selection, grouping, or querying. Instead, they provide additional context that can be consumed by controllers, tools, operators, or external integrations.
+
+---
+
+# Core Concept
+
+Annotations are considered passive metadata.
+
+Kubernetes itself stores and preserves them, but does not interpret or act on them unless a specific component is designed to read them.
+
+---
+
+# Common Uses of Annotations
+
+Annotations are commonly used for:
+
+- Build or release information
+- Git commit references
+- Deployment timestamps
+- Monitoring or logging configuration
+- Ingress/controller-specific settings
+- Tooling metadata (Helm, Argo CD, etc.)
+
+---
+
+# Implementation of Annotation Using Deployment
+
+## Step 1: Create Deployment and Service YAML Files
+
+---
+
+# pod.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pod-dep
+  namespace: dev
+
+  annotations:
+    kubernetes.io/change-cause: "Deploy in redpage"
+    docker_url: ""
+
+spec:
+  minReadySeconds: 5
+  replicas: 5
+
+  selector:
+    matchLabels:
+      app: red-app
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  template:
+    metadata:
+      name: my-red-pod
+
+      labels:
+        app: red-app
+
+    spec:
+      containers:
+        - name: red-con
+          image: opsbynikhil/redpage:REDPAGE
+
+          ports:
+            - containerPort: 80
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+
+            successThreshold: 1
+            failureThreshold: 5
+
+          resources:
+            requests:
+              cpu: 250m
+              memory: 64Mi
+
+            limits:
+              cpu: 450m
+              memory: 128Mi
+```
+
+---
+
+# service.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: svc-deployment
+  namespace: dev
+
+spec:
+  type: NodePort
+
+  selector:
+    app: red-app
+
+  ports:
+    - name: node
+      port: 80
+      nodePort: 32000
+```
+
+---
+
+# Step 2: Apply YAML Files
+
+```bash
+kubectl apply -f .
+```
+
+## Error
+
+```bash
+error when creating "p.yaml": namespaces "dev" not found
+error when creating "s.yaml": namespaces "dev" not found
+```
+
+---
+
+# Step 3: Create Namespace
+
+```bash
+kubectl create namespace dev
+```
+
+## Output
+
+```bash
+namespace/dev created
+```
+
+---
+
+# Step 4: Verify Namespace
+
+```bash
+kubectl get ns
+```
+
+## Output
+
+```bash
+NAME                STATUS   AGE
+default             Active   29m
+dev                 Active   10s
+kube-node-lease     Active   29m
+kube-public         Active   29m
+kube-system         Active   29m
+```
+
+---
+
+# Step 5: Apply YAML Files Again
+
+```bash
+kubectl apply -f .
+```
+
+## Output
+
+```bash
+deployment.apps/pod-dep created
+service/svc-deployment created
+```
+
+---
+
+# Step 6: Switch to Namespace
+
+```bash
+kubectl config set-context --current --namespace=dev
+```
+
+## Output
+
+```bash
+Context "My_AWS_02_User@mycluster.ap-south-1.eksctl.io" modified.
+```
+
+---
+
+# Step 7: Check Service
+
+```bash
+kubectl get svc
+```
+
+---
+
+# Step 8: Check Pods
+
+```bash
+kubectl get po
+```
+
+## Output
+
+```bash
+NAME                        READY   STATUS    RESTARTS   AGE
+pod-dep-d789898f9-62fcb    1/1     Running   0          7m12s
+pod-dep-d789898f9-8fjvh    1/1     Running   0          7m12s
+pod-dep-d789898f9-fmd7g    1/1     Running   0          7m12s
+pod-dep-d789898f9-wbm59    1/1     Running   0          7m12s
+pod-dep-d789898f9-znsh7    1/1     Running   0          7m12s
+```
+
+---
+
+# Step 9: Check All Resources
+
+```bash
+kubectl get all
+```
+
+## Output
+
+```bash
+NAME                             READY   STATUS    RESTARTS   AGE
+pod/pod-dep-d789898f9-62fcb     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-8fjvh     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-fmd7g     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-wbm59     1/1     Running   0          7m27s
+pod/pod-dep-d789898f9-znsh7     1/1     Running   0          7m27s
+
+NAME                         TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)        AGE
+service/svc-deployment       NodePort   10.100.175.36    <none>        80:31234/TCP   7m27s
+
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/pod-dep    5/5     5            5           7m27s
+
+NAME                                   DESIRED   CURRENT   READY   AGE
+replicaset.apps/pod-dep-d789898f9     5         5         5       7m27s
+```
+
+---
+
+# Step 10: Perform Rollout Update
+
+```bash
+kubectl set image deployments.apps/pod-dep red-con=opsbynikhil/yellowpage:YELLOWPAGE
+```
+
+## Syntax
+
+```bash
+kubectl set image <deployment-name> <container-name>=<image-name>
+```
+
+---
+
+# Step 11: Check Rollout Status
+
+## Method 1
+
+```bash
+kubectl rollout status deployment.apps/pod-dep
+```
+
+## Method 2
+
+```bash
+kubectl rollout status deployment pod-dep -n dev
+```
+
+---
+
+# Step 12: Check Rollout History
+
+```bash
+kubectl rollout history deployment.apps/pod-dep
+```
+
+---
+
+# Step 13: Update Annotation
+
+## Method 1
+
+```bash
+kubectl annotate deployment/<name> kubernetes.io/change-cause="Updated image version"
+```
+
+## Method 2
+
+```bash
+kubectl annotate deployment.apps/pod-dep kubernetes.io/change-cause="red page to yellow page"
+```
+
+---
+
+# Step 14: Verify Annotation History
+
+## Method 1
+
+```bash
+kubectl rollout history deployment/<name>
+```
+
+## Method 2
+
+```bash
+kubectl rollout history deployment.apps/pod-dep
+```
+
+## Output
+
+```bash
+deployment.apps/pod-dep
+
+REVISION    CHANGE-CAUSE
+1           Deploy in redpage
+2           red page to yellow page
+```
+
+---
+
+# Step 15: Rollback Deployment
+
+## Method 1
+
+```bash
+kubectl rollout undo deployment/<name>
+```
+
+## Method 2
+
+```bash
+kubectl rollout undo deployment/pod-dep
+```
+
+---
+
+# Step 16: Verify Rollback History
+
+```bash
+kubectl rollout history deployment.apps/pod-dep
+```
+
+## Output
+
+```bash
+deployment.apps/pod-dep
+
+REVISION    CHANGE-CAUSE
+2           red page to yellow page
+3           Deploy in red page
+```
+
+---
+
+# Important Interview Points
+
+- Annotations store non-identifying metadata.
+- Annotations are not used for selection or filtering.
+- Labels are used for querying, annotations are used for additional information.
+- `kubernetes.io/change-cause` helps track deployment changes.
+- Rollout history stores annotation-based deployment revisions.
+- `kubectl annotate` is used to update annotations dynamically.
+- Rollback creates a new revision in deployment history.
+
+---
+
+# Common Annotation Commands
+
+## Add Annotation
+
+```bash
+kubectl annotate deployment.apps/pod-dep author=nikhil
+```
+
+## View Annotations
+
+```bash
+kubectl describe deployment pod-dep
+```
+
+## Remove Annotation
+
+```bash
+kubectl annotate deployment.apps/pod-dep author-
+```
+
+---
+
+# Summary
+
+This project demonstrates:
+
+- Kubernetes Annotations
+- Deployment Metadata Management
+- Rollout Updates
+- Rollback Operations
+- Revision Tracking
+- Annotation-based Change History
+- Namespace-based Deployment
+- NodePort Service Exposure
+- Production-style Kubernetes Workflow
+
+---
+
+# Implementation of Annotation Using Deployment
+
+[Implementation of Annotation Using Deployment](./images/deployment-annotations-namepace.png)
+
+---
+
+# Kubernetes Stateful vs Stateless Applications
+
+---
+
+# Stateless Application
+
+## Definition
+
+A **Stateless Application** is an application that does not store client or session data inside the pod memory.
+
+Each request is independent, and any pod can handle the request.
+
+In Kubernetes, stateless applications are generally managed using a **Deployment** object.
+
+---
+
+# Stateless Application Architecture
+
+| Component               | Explanation                                |
+| ----------------------- | ------------------------------------------ |
+| User Requests           | Client requests coming from browser/mobile |
+| Load Balancer / Service | Distributes traffic across pods            |
+| Pods                    | Running application containers             |
+| Deployment              | Manages stateless pods                     |
+| Storage                 | Usually not required                       |
+
+---
+
+# Characteristics of Stateless Applications
+
+- No persistent storage
+- Pods are interchangeable
+- Easy horizontal scaling
+- Fast recovery
+- Suitable for frontend and APIs
+
+---
+
+# Examples of Stateless Applications
+
+- Nginx
+- React Application
+- Node.js API
+- Spring Boot REST API
+
+---
+
+# Kubernetes Resource Used
+
+## Deployment
+
+A stateless application does not store session or user data inside the pod.
+
+Any pod can handle any request.
+
+Kubernetes uses **Deployments** to manage stateless applications because pods are identical and easily replaceable.
+
+---
+
+# Stateful Application
+
+## Definition
+
+A **Stateful Application** is an application that stores persistent data and requires stable pod identity.
+
+Each pod maintains its own data, hostname, and storage even after restart.
+
+In Kubernetes, stateful applications are managed using a **StatefulSet** object.
+
+---
+
+# Characteristics of Stateful Applications
+
+- Persistent data storage
+- Stable pod identity
+- Ordered scaling and deployment
+- Data survives pod restart
+- Each pod has separate storage
+
+---
+
+# Examples of Stateful Applications
+
+- MySQL
+- PostgreSQL
+- MongoDB
+- Kafka
+- Cassandra
+
+---
+
+# Kubernetes Resource Used
+
+## StatefulSet
+
+A stateful application stores persistent data and requires unique pod identity.
+
+Kubernetes uses **StatefulSets** with **Persistent Volumes** to manage stateful workloads such as databases and messaging systems.
+
+---
+
+# StatefulSet Implementation in Kubernetes
+
+---
+
+# pod.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: my-db
+  namespace: dev
+
+spec:
+  minReadySeconds: 5
+  replicas: 5
+
+  selector:
+    matchLabels:
+      app: my-app-db
+
+  serviceName: my-db-svc
+
+  template:
+    metadata:
+      labels:
+        app: my-app-db
+
+    spec:
+      containers:
+        - name: my-db-cont
+          image: mysql
+
+          ports:
+            - containerPort: 3306
+
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+
+            - name: MYSQL_DATABASE
+              value: Devops_course
+
+            - name: MYSQL_USER
+              value: Devops
+
+            - name: MYSQL_PASSWORD
+              value: Devops@12345
+
+          volumeMounts:
+            - name: mysql-db
+              mountPath: /var/lib/mysql
+
+  volumeClaimTemplates:
+    - metadata:
+        name: mysql-db
+
+      spec:
+        accessModes:
+          - ReadWriteOnce
+
+        resources:
+          requests:
+            storage: 2Gi
+```
+
+---
+
+# service.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: my-db-svc
+  namespace: dev
+
+spec:
+  type: ClusterIP
+  clusterIP: None
+
+  selector:
+    app: my-app-db
+
+  ports:
+    - port: 3306
+```
+
+---
+
+# Implementation of StatefulSet and Login into Database
+
+---
+
+# Step 1: Apply YAML Files
+
+```bash
+kubectl apply -f .
+```
+
+## Error
+
+```bash
+Error from server (NotFound): error when creating "p.yaml": namespaces "dev" not found
+
+Error from server (NotFound): error when creating "s.yaml": namespaces "dev" not found
+```
+
+---
+
+# Step 2: Create Namespace
+
+```bash
+kubectl create namespace dev
+```
+
+---
+
+# Step 3: Apply YAML Files Again
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+# Step 4: Switch Namespace
+
+```bash
+kubectl config set-context --current --namespace=dev
+```
+
+---
+
+# Step 5: Verify StatefulSet Resources
+
+```bash
+kubectl get all
+```
+
+## Output
+
+```bash
+NAME          READY   STATUS    RESTARTS   AGE
+pod/my-db-0   1/1     Running   0          109s
+pod/my-db-1   1/1     Running   0          73s
+pod/my-db-2   1/1     Running   0          35s
+pod/my-db-3   1/1     Running   0          21s
+pod/my-db-4   1/1     Running   0          9s
+
+NAME                TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)    AGE
+service/my-db-svc   ClusterIP   None         <none>        3306/TCP   110s
+
+NAME                     READY   AGE
+statefulset.apps/my-db   5/5     110s
+```
+
+---
+
+# Step 6: Login into MySQL Pod
+
+## Method 1
+
+```bash
+kubectl exec -it my-db-0 -n dev -- bash
+```
+
+## Method 2
+
+```bash
+kubectl exec -it <pod-name> -n <namespace-name> -- bash
+```
+
+---
+
+# Step 7: Move to MySQL Directory
+
+```bash
+cd /var/lib/mysql
+```
+
+---
+
+# Step 8: Login to MySQL
+
+```bash
+mysql -u Devops -p
+```
+
+## Generic Syntax
+
+```bash
+mysql -u <username> -p
+```
+
+---
+
+# Step 9: Verify Databases
+
+```sql
+show databases;
+```
+
+## Output
+
+```sql
++--------------------+
+| Database           |
++--------------------+
+| Devops_course      |
+| information_schema |
+| performance_schema |
++--------------------+
+3 rows in set (0.010 sec)
+```
+
+---
+
+# Step 10: Use Database
+
+```sql
+use Devops_course;
+```
+
+---
+
+# Step 11: Verify Tables
+
+```sql
+show tables;
+```
+
+---
+
+# Step 12: Create Table
+
+```sql
+create table my_devops(name varchar(50));
+```
+
+---
+
+# Step 13: Verify Table Creation
+
+```sql
+show tables;
+```
+
+---
+
+# Step 14: Insert Data
+
+```sql
+insert into my_devops values("Terraform");
+```
+
+---
+
+# Step 15: Describe Table
+
+```sql
+desc my_devops;
+```
+
+---
+
+# Step 16: Verify Data
+
+```sql
+select * from my_devops;
+```
+
+---
+
+# Step 17: Insert Multiple Records
+
+```sql
+insert into my_devops values("Docker"),("Linux"),("GitHub"),("Kubernates");
+```
+
+---
+
+# Step 18: Verify Final Records
+
+```sql
+select * from my_devops;
+```
+
+## Output
+
+```sql
++------------+
+| name       |
++------------+
+| Terraform  |
+| Docker     |
+| Linux      |
+| GitHub     |
+| Kubernates |
++------------+
+5 rows in set (0.001 sec)
+```
+
+---
+
+# Important Interview Points
+
+| Topic                 | Explanation                                          |
+| --------------------- | ---------------------------------------------------- |
+| Stateless Application | Does not store user/session data                     |
+| Stateful Application  | Stores persistent data                               |
+| Deployment            | Used for stateless workloads                         |
+| StatefulSet           | Used for stateful workloads                          |
+| Pod Identity          | Stable in StatefulSet                                |
+| Storage               | Persistent storage required in Stateful Applications |
+| Scaling               | Ordered scaling in StatefulSet                       |
+| Service Type          | Headless Service used with StatefulSet               |
+
+---
+
+# Difference Between Stateless and Stateful Applications
+
+| Feature             | Stateless Application | Stateful Application |
+| ------------------- | --------------------- | -------------------- |
+| Data Storage        | No persistent data    | Persistent data      |
+| Pod Identity        | Random                | Stable               |
+| Scaling             | Easy                  | Ordered              |
+| Recovery            | Fast                  | Stateful recovery    |
+| Kubernetes Resource | Deployment            | StatefulSet          |
+| Storage Requirement | Optional              | Mandatory            |
+| Examples            | Nginx, React          | MySQL, MongoDB       |
+
+---
+
+# Key Kubernetes Concepts Used
+
+- StatefulSet
+- Deployment
+- Persistent Volume Claim (PVC)
+- Headless Service
+- Namespace
+- ClusterIP Service
+- MySQL Database
+- Volume Mounts
+- Environment Variables
+- Pod Identity
+
+---
+
+# Summary
+
+This project demonstrates:
+
+- Stateless Applications in Kubernetes
+- Stateful Applications in Kubernetes
+- Deployment vs StatefulSet
+- MySQL StatefulSet Deployment
+- Persistent Storage Configuration
+- Headless Service Configuration
+- Database Login and Validation
+- Kubernetes Namespace Usage
+- Pod Persistence and Stable Identity
+- Production-style Stateful Workload Management
+
+---
+
+# Kubernates statefullset
+
+[Kubernates statefullset](./images/k8s-statefulset.png)
+
+---

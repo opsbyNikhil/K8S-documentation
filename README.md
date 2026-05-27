@@ -17,7 +17,7 @@
       - [Used In:](#used-in)
       - [Provides:](#provides)
   - [🖥️ Self-Hosted Kubernetes Cluster](#️-self-hosted-kubernetes-cluster)
-      - [Tools:](#tools)
+    - [Tools:](#tools)
   - [☁️ Cloud Hosted Kubernetes Services](#️-cloud-hosted-kubernetes-services)
   - [✅ Summary](#-summary)
 - [☸️ Kubernetes Architecture (K8s)](#️-kubernetes-architecture-k8s)
@@ -261,7 +261,7 @@
     - [2. OnFailure](#2-onfailure)
     - [3. Never](#3-never)
 - [Kubernates Restart Policy](#kubernates-restart-policy)
-    - [Summary](#summary-5)
+  - [Summary](#summary-5)
 - [Kubernetes Pod Probes (Startup Probe)](#kubernetes-pod-probes-startup-probe)
   - [Overview](#overview-1)
   - [Types of Probes](#types-of-probes)
@@ -315,7 +315,7 @@
     - [Option 2: Reduce Application Memory Usage](#option-2-reduce-application-memory-usage)
     - [Option 3: Tune Application Settings](#option-3-tune-application-settings)
 - [Summary](#summary-7)
-    - [Main Troubleshooting Flow](#main-troubleshooting-flow)
+  - [Main Troubleshooting Flow](#main-troubleshooting-flow)
 - [Kubernates-OOMKill-Troubleshoot-Steps](#kubernates-oomkill-troubleshoot-steps)
 - [Kubernetes Resource Limits – Successful Run Example](#kubernetes-resource-limits--successful-run-example)
   - [Scenario](#scenario-1)
@@ -677,6 +677,168 @@
 - [Key Kubernetes Concepts Used](#key-kubernetes-concepts-used)
 - [Summary](#summary-11)
 - [Kubernates statefullset](#kubernates-statefullset)
+- [Kubernetes StatefulSet - Data Persistence Overview](#kubernetes-statefulset---data-persistence-overview)
+  - [Overview](#overview-7)
+  - [How Data Persistence Works](#how-data-persistence-works)
+  - [Pod Deletion and Recovery](#pod-deletion-and-recovery)
+  - [Key Benefit](#key-benefit)
+- [Kubernetes: StatefulSet vs Stateless (Deployment)](#kubernetes-statefulset-vs-stateless-deployment)
+  - [Overview](#overview-8)
+  - [Comparison Table](#comparison-table)
+  - [Key Difference](#key-difference)
+  - [Summary](#summary-12)
+- [Kubernetes ConfigMap](#kubernetes-configmap)
+  - [Definition](#definition-14)
+  - [Purpose of ConfigMap](#purpose-of-configmap)
+  - [What Type of Data is Stored in ConfigMap?](#what-type-of-data-is-stored-in-configmap)
+  - [How ConfigMap Works](#how-configmap-works)
+  - [Create ConfigMap (Command Line)](#create-configmap-command-line)
+  - [Kubernetes ConfigMap Example](#kubernetes-configmap-example)
+    - [ConfigMap Definition (configmap.yaml)](#configmap-definition-configmapyaml)
+    - [Pod Definition Using ConfigMap (pod.yaml)](#pod-definition-using-configmap-podyaml)
+    - [Deploy Resources](#deploy-resources)
+    - [Verify Resources](#verify-resources)
+    - [Check ConfigMap](#check-configmap)
+    - [Access Pod and Verify Environment Variables](#access-pod-and-verify-environment-variables)
+    - [Check Environment Variables](#check-environment-variables)
+- [Kubernetes Secrets](#kubernetes-secrets)
+  - [Definition](#definition-15)
+  - [Purpose of Secrets](#purpose-of-secrets)
+  - [What Type of Data is Stored in Secrets?](#what-type-of-data-is-stored-in-secrets)
+  - [Create Secret Using Command Line](#create-secret-using-command-line)
+    - [Secret Definition (secret.yaml)](#secret-definition-secretyaml)
+    - [Pod Definition Using Secret (pod.yaml)](#pod-definition-using-secret-podyaml)
+    - [Deploy Resources](#deploy-resources-1)
+    - [Verify Resources](#verify-resources-1)
+    - [Check Secrets](#check-secrets)
+    - [Access Pod and Verify Environment Variables](#access-pod-and-verify-environment-variables-1)
+    - [Check Environment Variables](#check-environment-variables-1)
+    - [OR View All Environment Variables](#or-view-all-environment-variables)
+- [Summary](#summary-13)
+- [Kubernetes Secrets Security (Why Base64 is NOT Secure) + AWS Secrets Manager Integration](#kubernetes-secrets-security-why-base64-is-not-secure--aws-secrets-manager-integration)
+  - [Why Kubernetes Secrets are NOT Fully Secure](#why-kubernetes-secrets-are-not-fully-secure)
+    - [Example:](#example-10)
+    - [Conclusion:](#conclusion)
+  - [Better Secure Approach (Cloud Secrets Managers)](#better-secure-approach-cloud-secrets-managers)
+  - [Recommended Architecture (Best Practice)](#recommended-architecture-best-practice)
+- [AWS Secrets Manager with EKS – Production Implementation Guide](#aws-secrets-manager-with-eks--production-implementation-guide)
+  - [Prerequisites](#prerequisites)
+  - [Step 1: Create EC2 Instance](#step-1-create-ec2-instance)
+  - [Step 2: Install Required Packages](#step-2-install-required-packages-1)
+  - [Step 3: Configure AWS CLI](#step-3-configure-aws-cli-1)
+  - [Step 4: Verify AWS Connectivity](#step-4-verify-aws-connectivity)
+  - [Step 5: Install kubectl](#step-5-install-kubectl-1)
+  - [Step 6: Install eksctl](#step-6-install-eksctl)
+  - [Step 7: Create EKS Cluster](#step-7-create-eks-cluster)
+  - [Step 8: Enable OIDC Provider](#step-8-enable-oidc-provider)
+  - [Step 9: Create IAM Policy](#step-9-create-iam-policy)
+  - [Step 10: Create IAM Role for IRSA](#step-10-create-iam-role-for-irsa)
+  - [Step 11: Install Secrets Store CSI Driver](#step-11-install-secrets-store-csi-driver)
+  - [Step 12: Install AWS Provider](#step-12-install-aws-provider)
+  - [Step 13: Create Service Account](#step-13-create-service-account)
+  - [Step 14: Create SecretProviderClass](#step-14-create-secretproviderclass)
+  - [Step 15: Create Deployment](#step-15-create-deployment)
+  - [Step 16: Apply Kubernetes Manifests](#step-16-apply-kubernetes-manifests)
+  - [Step 17: Troubleshooting CSI Mount Error](#step-17-troubleshooting-csi-mount-error)
+  - [Step 18: Patch CSI Driver](#step-18-patch-csi-driver)
+  - [Step 19: Verify Secrets](#step-19-verify-secrets)
+  - [Step 20: Cleanup Resources](#step-20-cleanup-resources)
+- [AWS Secrets Manager with Kubernetes (EKS) - IRSA, OIDC, CSI Driver](#aws-secrets-manager-with-kubernetes-eks---irsa-oidc-csi-driver)
+  - [Explanation](#explanation-9)
+  - [Benefits](#benefits)
+  - [Interview Conclusion](#interview-conclusion)
+- [1. CSI Driver (Secrets Store CSI Driver)](#1-csi-driver-secrets-store-csi-driver)
+  - [Definition](#definition-16)
+  - [What is Secrets Store CSI Driver?](#what-is-secrets-store-csi-driver)
+  - [Purpose of CSI Driver](#purpose-of-csi-driver)
+  - [Why We Use It?](#why-we-use-it)
+    - [Without CSI Driver: AWS Secret → Cannot directly access Pod](#without-csi-driver-aws-secret--cannot-directly-access-pod)
+    - [With CSI Driver:](#with-csi-driver)
+  - [Key Benefit](#key-benefit-1)
+- [2. OIDC (OpenID Connect)](#2-oidc-openid-connect)
+  - [Definition](#definition-17)
+  - [Purpose of OIDC in EKS](#purpose-of-oidc-in-eks)
+  - [Why OIDC is Required?](#why-oidc-is-required)
+    - [We avoid:](#we-avoid)
+  - [What OIDC Does?](#what-oidc-does)
+  - [Real-Time Flow](#real-time-flow)
+  - [Key Point](#key-point)
+- [3. Service Account](#3-service-account)
+  - [Definition](#definition-18)
+  - [Simple Analogy](#simple-analogy)
+  - [Purpose of ServiceAccount](#purpose-of-serviceaccount)
+  - [Why ServiceAccount is Used in AWS Secrets Setup?](#why-serviceaccount-is-used-in-aws-secrets-setup)
+  - [Final Summary](#final-summary)
+- [Kubernetes + AWS Ingress Architecture (Zomato.com Flow)](#kubernetes--aws-ingress-architecture-zomatocom-flow)
+  - [End-to-End Request Flow](#end-to-end-request-flow)
+  - [What is Route 53?](#what-is-route-53)
+    - [DNS Records Used:](#dns-records-used)
+  - [Ingress vs Ingress Controller](#ingress-vs-ingress-controller)
+    - [Ingress (Kubernetes Object)](#ingress-kubernetes-object)
+    - [Ingress Controller (Actual Traffic Handler)](#ingress-controller-actual-traffic-handler)
+  - [Types of Ingress Controllers](#types-of-ingress-controllers)
+    - [1. Open Source Controllers](#1-open-source-controllers)
+    - [2. Cloud-Based Controllers](#2-cloud-based-controllers)
+      - [AWS](#aws)
+      - [Azure](#azure)
+  - [Kubernetes Service (Internal Load Balancer)](#kubernetes-service-internal-load-balancer)
+    - [Example:](#example-11)
+  - [Microservices Architecture](#microservices-architecture)
+    - [Example:](#example-12)
+    - [Benefits:](#benefits-1)
+  - [Pod Architecture](#pod-architecture)
+    - [Sidecar Used For:](#sidecar-used-for)
+  - [Event-Driven Communication (SNS)](#event-driven-communication-sns)
+    - [Events:](#events)
+    - [Flow: Microservice → SNS Topic → Slack / Email / Teams](#flow-microservice--sns-topic--slack--email--teams)
+  - [Infrastructure (Terraform + EKS)](#infrastructure-terraform--eks)
+    - [Terraform Manages:](#terraform-manages)
+    - [EKS (Elastic Kubernetes Service)](#eks-elastic-kubernetes-service)
+  - [Auto Scaling \& High Availability](#auto-scaling--high-availability)
+    - [Auto Scaling:](#auto-scaling)
+    - [Multi-AZ Setup:](#multi-az-setup)
+    - [Benefits:](#benefits-2)
+  - [Flow](#flow-2)
+  - [How We Maintain Environments in Kubernetes (Point-wise)](#how-we-maintain-environments-in-kubernetes-point-wise)
+    - [1. Separate Environments](#1-separate-environments)
+    - [2. Multi-AZ Deployment](#2-multi-az-deployment)
+    - [3. Production Worker Nodes](#3-production-worker-nodes)
+    - [4. Cluster Autoscaler (Node Level Scaling)](#4-cluster-autoscaler-node-level-scaling)
+    - [5. Horizontal Pod Autoscaler (HPA)](#5-horizontal-pod-autoscaler-hpa)
+    - [6. Instance Types Used](#6-instance-types-used)
+    - [7. Benefits of This Setup](#7-benefits-of-this-setup)
+  - [Interview Answer: How many microservices are you maintaining?](#interview-answer-how-many-microservices-are-you-maintaining)
+    - [My Responsibility](#my-responsibility)
+    - [What I Manage for These Services](#what-i-manage-for-these-services)
+    - [Summary](#summary-14)
+  - [Interview Answer: How do you maintain Environment and SNS?](#interview-answer-how-do-you-maintain-environment-and-sns)
+    - [1. Environment Management (Microservices Architecture)](#1-environment-management-microservices-architecture)
+      - [Benefits:](#benefits-3)
+    - [2. Environment Isolation](#2-environment-isolation)
+    - [3. Monitoring \& Alerting Using AWS SNS](#3-monitoring--alerting-using-aws-sns)
+    - [4. How SNS Works in Our System](#4-how-sns-works-in-our-system)
+      - [Events include:](#events-include)
+    - [5. Notification Flow](#5-notification-flow)
+    - [6. Benefits of Using SNS](#6-benefits-of-using-sns)
+    - [Summary](#summary-15)
+  - [Interview Answer: How do you maintain infrastructure using Terraform?](#interview-answer-how-do-you-maintain-infrastructure-using-terraform)
+    - [1. Terraform Usage](#1-terraform-usage)
+    - [2. AWS Responsibility Split](#2-aws-responsibility-split)
+    - [3. Reusable Modules](#3-reusable-modules)
+    - [4. CI/CD Integration](#4-cicd-integration)
+      - [Benefits:](#benefits-4)
+    - [5. Cluster Configuration](#5-cluster-configuration)
+    - [6. Summary](#6-summary)
+  - [Interview Answer: Ingress Flow in Kubernetes (Zomato Example)](#interview-answer-ingress-flow-in-kubernetes-zomato-example)
+    - [1. End-to-End Request Flow](#1-end-to-end-request-flow)
+  - [2. Route 53 Role](#2-route-53-role)
+  - [3. Ingress (Kubernetes Resource)](#3-ingress-kubernetes-resource)
+    - [Important:](#important)
+  - [4. Ingress Controller](#4-ingress-controller)
+  - [5. Service Layer](#5-service-layer)
+  - [6. Cloud-Based Ingress Options](#6-cloud-based-ingress-options)
+  - [7. Summary](#7-summary)
+- [Kubernates Ingress Flow](#kubernates-ingress-flow)
 
 ---
 
@@ -7877,5 +8039,1548 @@ This project demonstrates:
 # Kubernates statefullset
 
 ![Kubernates statefullset](./images/k8s-statefulset.png)
+
+---
+
+# Kubernetes StatefulSet - Data Persistence Overview
+
+## Overview
+
+A **StatefulSet** in Kubernetes provides stable pod identity and persistent storage for stateful applications such as databases.
+
+It ensures that each pod maintains its identity and storage across restarts, rescheduling, or failures.
+
+---
+
+## How Data Persistence Works
+
+1. A database pod is created by a StatefulSet.
+2. The pod mounts a **PersistentVolume (PV)** through a **PersistentVolumeClaim (PVC)**.
+3. Inside the pod, a database is created along with tables and records.
+4. All data is written to the **persistent storage layer**, not the container filesystem.
+
+---
+
+## Pod Deletion and Recovery
+
+- If the pod is deleted, the StatefulSet controller automatically recreates it.
+- The recreated pod retains the same identity.
+- It reattaches to the same **PersistentVolumeClaim (PVC)** and **PersistentVolume (PV)**.
+- As a result, all previously stored database data remains intact.
+
+---
+
+## Key Benefit
+
+This demonstrates **data persistence in StatefulSets**, where the storage lifecycle is independent of the pod lifecycle.
+
+Even if pods are terminated or recreated, the data remains safe and consistent.
+
+---
+
+# Kubernetes: StatefulSet vs Stateless (Deployment)
+
+## Overview
+
+In Kubernetes, applications can be managed as either **stateful** or **stateless** workloads depending on whether they need to retain data and identity.
+
+---
+
+## Comparison Table
+
+| Feature          | StatefulSet                                                    | Stateless (Deployment)                                        |
+| ---------------- | -------------------------------------------------------------- | ------------------------------------------------------------- |
+| Definition       | Manages stateful applications with stable identity and storage | Manages stateless applications where pods are interchangeable |
+| Pod Identity     | Each pod has a fixed identity (e.g., `db-0`, `db-1`)           | Pods have random names and no identity                        |
+| Storage          | Uses PersistentVolume (PV) and PersistentVolumeClaim (PVC)     | Uses temporary/ephemeral storage                              |
+| Data Persistence | Data remains even after pod restart or deletion                | Data is lost when pod is deleted                              |
+| Pod Ordering     | Pods are created, updated, and deleted in a specific order     | No ordering guarantee                                         |
+| Scaling Behavior | Scales in a predictable ordered manner                         | Scales up and down freely and independently                   |
+| Network Identity | Stable DNS name for each pod                                   | No stable network identity                                    |
+| Self-Healing     | Recreates pod with same identity and storage                   | Recreates pod as a new instance                               |
+| Use Cases        | Databases (MySQL, PostgreSQL), Kafka, Redis                    | Web apps, APIs, frontend services                             |
+| Controller Type  | StatefulSet Controller                                         | Deployment Controller                                         |
+
+---
+
+## Key Difference
+
+- **StatefulSet →** Used for applications that require **persistent data and stable identity**
+- **Deployment →** Used for applications that are **stateless, scalable, and interchangeable**
+
+---
+
+## Summary
+
+StatefulSet is designed for workloads where **data consistency and identity matter**, while Deployment is ideal for **highly scalable and replaceable applications**.
+
+---
+
+# Kubernetes ConfigMap
+
+## Definition
+
+In Kubernetes, a **ConfigMap** is an object used to store **non-sensitive configuration data** in key-value format. It helps separate application configuration from the container image, making applications more portable and easier to manage.
+
+---
+
+## Purpose of ConfigMap
+
+The main purpose of ConfigMap is:
+
+- To store **non-confidential application configuration**
+- To avoid hardcoding configuration values inside:
+  - Application code
+  - Docker images
+  - YAML files
+- To manage configuration dynamically without rebuilding container images
+
+ConfigMap improves:
+
+- Flexibility
+- Portability
+- Configuration management
+
+---
+
+## What Type of Data is Stored in ConfigMap?
+
+ConfigMap is used for **non-sensitive data** such as:
+
+| Configuration Data     | Example               |
+| ---------------------- | --------------------- |
+| Application URLs       | Backend API URL       |
+| Port Numbers           | 8080                  |
+| Environment Names      | dev, test, prod       |
+| Application Properties | Debug mode            |
+| Git Repository URLs    | GitHub repository URL |
+| Configuration Files    | app.properties        |
+
+---
+
+## How ConfigMap Works
+
+1. ConfigMap object is created in Kubernetes.
+2. Configuration values are stored in key-value format.
+3. Pods consume the ConfigMap by:
+   - Environment variables
+   - Mounted configuration files
+4. Applications read configuration during runtime.
+
+---
+
+## Create ConfigMap (Command Line)
+
+```bash
+kubectl create configmap app-config \
+  --from-literal=APP_ENV=dev \
+  --from-literal=PORT=8080
+```
+
+---
+
+## Kubernetes ConfigMap Example
+
+### ConfigMap Definition (configmap.yaml)
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-config
+data:
+  APP_ENV: dev
+  APP_PORT: "8080"
+  DOCKER_BUILDID: "1"
+```
+
+---
+
+### Pod Definition Using ConfigMap (pod.yaml)
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: my-config-cont
+      image: nginx
+      env:
+        - name: APP_ENV
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: APP_ENV
+
+        - name: APP_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: APP_PORT
+
+        - name: DOCKER_BUILDID
+          valueFrom:
+            configMapKeyRef:
+              name: my-config
+              key: DOCKER_BUILDID
+```
+
+---
+
+### Deploy Resources
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+### Verify Resources
+
+- > Check Pod
+
+```bash
+kubectl get po
+```
+
+---
+
+### Check ConfigMap
+
+```bash
+kubectl get configmap
+```
+
+---
+
+### Access Pod and Verify Environment Variables
+
+- > Login to Pod
+
+```bash
+kubectl exec -it my-pod -- bash
+```
+
+---
+
+### Check Environment Variables
+
+```bash
+root@my-pod:/# env | grep APP_ENV
+APP_ENV=dev
+
+root@my-pod:/# env | grep APP_PORT
+APP_PORT=8080
+
+root@my-pod:/# env | grep DOCKER_BUILDID
+DOCKER_BUILDID=1
+```
+
+---
+
+# Kubernetes Secrets
+
+## Definition
+
+In Kubernetes, a **Secret** is an object used to store and manage **sensitive or confidential information** securely. Secrets are mainly used for storing data such as passwords, API keys, tokens, SSH keys, certificates, and database credentials required by applications running inside the cluster.
+
+---
+
+## Purpose of Secrets
+
+The main purpose of Secrets is:
+
+- To protect **confidential information**
+- To avoid hardcoding sensitive data inside:
+  - Application code
+  - Docker images
+  - YAML files
+- To securely provide credentials to pods and containers
+
+Secrets improve:
+
+- Security
+- Configuration management
+- Application portability
+
+---
+
+## What Type of Data is Stored in Secrets?
+
+Secrets are used for **sensitive data** such as:
+
+| Sensitive Data       | Example               |
+| -------------------- | --------------------- |
+| Passwords            | MySQL password        |
+| API Keys             | AWS API key           |
+| Tokens               | JWT token             |
+| Certificates         | SSL/TLS certificates  |
+| SSH Keys             | Git SSH private keys  |
+| Database Credentials | Username and password |
+
+---
+
+## Create Secret Using Command Line
+
+```bash
+kubectl create secret generic mysql-secret \
+  --from-literal=MYSQL_ROOT_PASSWORD=root123
+```
+
+---
+
+### Secret Definition (secret.yaml)
+
+```bash
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+data:
+  DB_USERNAME: "RGV2b3Bz"
+  DB_PASSWORD: "YWRtaW5AMTIzNDU="
+```
+
+- > Note: Values in data are Base64 encoded
+
+---
+
+### Pod Definition Using Secret (pod.yaml)
+
+```bash
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: my-sec-cont
+      image: nginx
+      env:
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: DB_USERNAME
+
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysecret
+              key: DB_PASSWORD
+```
+
+---
+
+### Deploy Resources
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+### Verify Resources
+
+- > Check Pods
+
+```bash
+kubectl get po
+```
+
+---
+
+### Check Secrets
+
+```bash
+kubectl get secret
+```
+
+---
+
+### Access Pod and Verify Environment Variables
+
+- > Login to Pod
+
+```bash
+kubectl exec -it my-pod -- bash
+```
+
+---
+
+### Check Environment Variables
+
+```bash
+root@my-pod:/# env | grep DB_USERNAME
+DB_USERNAME=Devops
+
+root@my-pod:/# env | grep DB_PASSWORD
+DB_PASSWORD=8080
+```
+
+### OR View All Environment Variables
+
+```bash
+root@my-pod:/# printenv
+```
+
+---
+
+# Summary
+
+- > Secrets store sensitive data securely
+- > Values are stored in Base64 encoded format
+- > Pods access secrets using secretKeyRef
+- > Helps improve security and avoids hardcoding credentials
+
+---
+
+# Kubernetes Secrets Security (Why Base64 is NOT Secure) + AWS Secrets Manager Integration
+
+## Why Kubernetes Secrets are NOT Fully Secure
+
+Kubernetes Secrets are only **Base64 encoded**, not encrypted by default.
+
+### Example:
+
+- `admin` → `YWRtaW4=`
+- `password123` → `cGFzc3dvcmQxMjM=`
+
+👉 Base64 is **encoding, not encryption**
+👉 Anyone with cluster access can decode it easily
+
+### Conclusion:
+
+Kubernetes Secrets alone are **NOT enough for production security**
+
+---
+
+## Better Secure Approach (Cloud Secrets Managers)
+
+For production-grade security, use external secret systems:
+
+| Cloud Provider | Secret Manager Service |
+| -------------- | ---------------------- |
+| AWS            | AWS Secrets Manager    |
+| Azure          | Azure Key Vault        |
+| GCP            | GCP Secret Manager     |
+
+---
+
+## Recommended Architecture (Best Practice)
+
+**AWS Secure Setup for Kubernetes (EKS):**
+
+---
+
+# AWS Secrets Manager with EKS – Production Implementation Guide
+
+This guide explains how to securely integrate **AWS Secrets Manager** with **Amazon EKS** using **IRSA (IAM Roles for Service Accounts)** and the **Secrets Store CSI Driver**.
+
+---
+
+## Prerequisites
+
+- AWS Account with administrative access
+- Ubuntu EC2 instance (or local machine with AWS CLI configured)
+- Basic knowledge of Kubernetes and IAM
+
+---
+
+## Step 1: Create EC2 Instance
+
+Launch an Ubuntu EC2 instance and connect via SSH.
+
+```bash
+ssh ubuntu@<Public-IP>
+```
+
+---
+
+## Step 2: Install Required Packages
+
+```bash
+sudo apt update && sudo apt install unzip -y
+```
+
+---
+
+## Step 3: Configure AWS CLI
+
+```bash
+aws configure
+```
+
+- Provide:
+
+- > AWS Access Key
+
+- > AWS Secret Key
+
+- > Region
+
+---
+
+## Step 4: Verify AWS Connectivity
+
+```bash
+aws s3 ls
+```
+
+---
+
+## Step 5: Install kubectl
+
+- Install kubectl from the official Kubernetes documentation.
+
+- > Verify installation:
+
+```bash
+kubectl version --client
+```
+
+---
+
+## Step 6: Install eksctl
+
+- Install eksctl from the official documentation.
+
+- > Verify installation:
+
+```bash
+eksctl version
+```
+
+---
+
+## Step 7: Create EKS Cluster
+
+```bash
+eksctl create cluster --name mycluster --region ap-south-1 --nodes 2 --node-type t3.medium
+```
+
+- This creates:
+
+- > EKS Control Plane
+
+- > Worker Nodes
+
+- > Networking & VPC
+
+- > kubeconfig automatically
+
+---
+
+## Step 8: Enable OIDC Provider
+
+- > OIDC establishes trust between EKS and AWS IAM.
+
+```bash
+eksctl utils associate-iam-oidc-provider --cluster mycluster --approve
+```
+
+---
+
+## Step 9: Create IAM Policy
+
+- > Create an IAM policy with at least the following permission:
+
+```bash
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["secretsmanager:GetSecretValue"],
+      "Resource": "arn:aws:secretsmanager:YOUR_REGION:YOUR_ACCOUNT_ID:secret:prod-*"
+    }
+  ]
+}
+```
+
+---
+
+## Step 10: Create IAM Role for IRSA
+
+- Create an IAM Role using:
+
+- > Web Identity
+
+- > EKS OIDC Provider
+
+- > sts.amazonaws.com
+
+- Attach the IAM Policy and copy the Role ARN.
+
+---
+
+## Step 11: Install Secrets Store CSI Driver
+
+```bash
+helm repo add secrets-store-csi-driver https://kubernetes-sigs.github.io/secrets-store-csi-driver/charts
+helm repo update
+helm install csi-secrets secrets-store-csi-driver/secrets-store-csi-driver --namespace kube-system
+```
+
+---
+
+## Step 12: Install AWS Provider
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/aws/secrets-store-csi-driver-provider-aws/main/deployment/aws-provider-installer.yaml
+```
+
+---
+
+## Step 13: Create Service Account
+
+- Create serviceaccount.yaml and bind the IAM Role ARN using annotations.
+
+```bash
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-sa
+  namespace: default
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::<ACCOUNT-ID>:role/<ROLE-NAME>
+```
+
+---
+
+## Step 14: Create SecretProviderClass
+
+- Define which AWS Secrets Manager secret should be mounted into the Pod.
+
+```bash
+apiVersion: secrets-store.csi.x-k8s.io/v1
+kind: SecretProviderClass
+metadata:
+  name: my-spc
+spec:
+  provider: aws
+  parameters:
+    objects: |
+      - objectName: "my-db-secret"
+        objectType: "secretsmanager"
+```
+
+---
+
+## Step 15: Create Deployment
+
+- Configure Deployment YAML with:
+
+```bash
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      serviceAccountName: secrets-sa
+      containers:
+        - name: app
+          image: nginx
+          volumeMounts:
+            - name: secrets-store
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          volumes:
+            - name: secrets-store
+              csi:
+                driver: secrets-store.csi.k8s.io
+                readOnly: true
+                volumeAttributes:
+                  secretProviderClass: "aws-secrets"
+```
+
+---
+
+## Step 16: Apply Kubernetes Manifests
+
+```bash
+kubectl apply -f serviceaccount.yaml
+kubectl apply -f secretproviderclass.yaml
+kubectl apply -f deployment.yaml
+```
+
+---
+
+## Step 17: Troubleshooting CSI Mount Error
+
+- If Pod is stuck in ContainerCreating:
+
+```bash
+kubectl describe pod <pod-name>
+```
+
+- > Common error: serviceAccount.tokens not provided
+
+---
+
+## Step 18: Patch CSI Driver
+
+```bash
+kubectl patch csidriver secrets-store.csi.k8s.io --type merge -p '{"spec":{"tokenRequests":[{"audience":"sts.amazonaws.com"}]}}'
+```
+
+---
+
+## Step 19: Verify Secrets
+
+```bash
+kubectl exec -it pod/<pod-name> -- bash
+cd /mnt/secrets
+cat DB
+```
+
+---
+
+## Step 20: Cleanup Resources
+
+- Remove Deployment, SecretProviderClass, ServiceAccount, and CSI Driver resources safely.
+
+```bash
+kubectl delete -f deployment.yaml
+kubectl delete -f secretproviderclass.yaml
+kubectl delete -f serviceaccount.yaml
+helm uninstall csi-secrets --namespace kube-system
+```
+
+---
+
+# AWS Secrets Manager with Kubernetes (EKS) - IRSA, OIDC, CSI Driver
+
+---
+
+## Explanation
+
+1. Sensitive data such as database credentials, API keys, and tokens are stored securely in **AWS Secrets Manager** instead of Kubernetes Secrets.
+
+2. **IRSA (IAM Role for Service Account)** is used to provide Pods secure access to AWS services without storing AWS access keys inside the container.
+
+3. **OIDC (OpenID Connect)** establishes trust between the EKS cluster and AWS IAM, allowing Kubernetes Service Accounts to assume IAM Roles securely.
+
+4. An **IAM Policy** is attached to the IAM Role with least-privilege permissions such as:
+   - `secretsmanager:GetSecretValue`
+
+5. **Secrets Store CSI Driver** is installed in the cluster to integrate Kubernetes with AWS Secrets Manager.
+
+6. **SecretProviderClass** is created to define which AWS secret should be fetched and mounted inside the Pod.
+
+7. The Pod dynamically retrieves secrets from AWS Secrets Manager and mounts them as files or environment variables.
+
+---
+
+## Benefits
+
+- No hardcoded credentials
+- No AWS access keys inside containers
+- Centralized secret management
+- Dynamic secret rotation
+- Least privilege access
+- Improved security and compliance
+
+---
+
+## Interview Conclusion
+
+In production **EKS environments**, instead of relying on native Kubernetes Secrets, we use:
+
+👉 AWS Secrets Manager + IRSA + Secrets Store CSI Driver
+
+This provides secure, dynamic, and least-privilege-based secret access for Kubernetes Pods.
+
+---
+
+# 1. CSI Driver (Secrets Store CSI Driver)
+
+## Definition
+
+CSI stands for:
+**Container Storage Interface**
+
+It is a standard interface that allows Kubernetes to communicate with external storage systems.
+
+---
+
+## What is Secrets Store CSI Driver?
+
+The **Secrets Store CSI Driver** is a Kubernetes plugin that:
+
+- Connects to external secret management systems
+- Pulls secrets dynamically
+- Mounts secrets inside Pods as files or volumes
+
+---
+
+## Purpose of CSI Driver
+
+- Avoid hardcoding secrets inside Kubernetes
+- Dynamically fetch secrets from external secret managers
+- Improve security and secret rotation
+
+---
+
+## Why We Use It?
+
+### Without CSI Driver: AWS Secret → Cannot directly access Pod
+
+### With CSI Driver:
+
+```bash
+AWS Secrets Manager
+↓
+CSI Driver
+↓
+Kubernetes Pod
+```
+
+---
+
+👉 CSI Driver acts as a secure bridge between Kubernetes and AWS Secrets Manager.
+
+---
+
+## Key Benefit
+
+- Secrets are not stored in Kubernetes
+- Secrets are fetched dynamically at runtime
+
+---
+
+# 2. OIDC (OpenID Connect)
+
+## Definition
+
+OIDC stands for:
+**OpenID Connect**
+
+It is an identity authentication protocol used for secure authentication between systems.
+
+---
+
+## Purpose of OIDC in EKS
+
+OIDC establishes trust between:
+
+- Kubernetes (EKS cluster)
+- AWS IAM
+
+---
+
+## Why OIDC is Required?
+
+- > Normally: Pod → Cannot directly access AWS services
+
+### We avoid:
+
+- Hardcoded AWS access keys
+- Credentials inside containers
+
+- So we use:
+- > OIDC + IAM Role + ServiceAccount
+
+---
+
+## What OIDC Does?
+
+OIDC allows:
+
+```bash
+Kubernetes ServiceAccount
+↓
+Assume IAM Role
+↓
+Access AWS Services
+```
+
+---
+
+## Real-Time Flow
+
+```bash
+Pod
+↓
+ServiceAccount
+↓
+OIDC Authentication
+↓
+IAM Role
+↓
+AWS Secrets Manager
+```
+
+---
+
+## Key Point
+
+Without OIDC:
+
+- IRSA will NOT work
+- AWS cannot trust Kubernetes identities
+
+---
+
+# 3. Service Account
+
+## Definition
+
+A **ServiceAccount** is:
+👉 An identity for Pods inside Kubernetes
+
+It defines:
+
+- What permissions Pods have
+- Which Kubernetes APIs Pods can access
+
+---
+
+## Simple Analogy
+
+A ServiceAccount is similar to:
+
+- IAM User in AWS
+- Linux User
+- Employee ID in a company
+
+---
+
+## Purpose of ServiceAccount
+
+- Provide identity to Pods
+- Control Pod permissions
+- Enable integration with IAM Roles using IRSA
+
+---
+
+## Why ServiceAccount is Used in AWS Secrets Setup?
+
+- > We bind: IAM Role → Kubernetes ServiceAccount
+
+- Then flow becomes:
+
+```bash
+Pod
+↓
+ServiceAccount
+↓
+Assume IAM Role via OIDC
+↓
+Access AWS Secrets Manager
+```
+
+---
+
+## Final Summary
+
+- > A Kubernetes ServiceAccount provides identity to Pods. In EKS, it works with IRSA and OIDC to securely access AWS services like Secrets Manager **without storing AWS credentials inside containers**.
+
+---
+
+# Kubernetes + AWS Ingress Architecture (Zomato.com Flow)
+
+---
+
+## End-to-End Request Flow
+
+When a user accesses **Zomato.com**, the request follows this path:
+
+```bash
+User
+↓
+Route 53 (DNS)
+↓
+AWS Load Balancer (ALB)
+↓
+Ingress Controller (Kubernetes)
+↓
+Ingress Resource (Rules Engine)
+↓
+Kubernetes Service (ClusterIP)
+↓
+Pods (Multiple Replicas)
+↓
+Database / Backend Services
+↓
+Response returns back to User
+```
+
+---
+
+---
+
+## What is Route 53?
+
+Amazon Route 53 is a **DNS service** that translates domain names into AWS infrastructure endpoints.
+
+### DNS Records Used:
+
+- **A Record** → Maps domain → IP address
+- **CNAME Record** → Maps domain → another domain
+- **Alias Record** → Maps domain → AWS services (ALB, CloudFront, S3)
+- **TLS/SSL (ACM)** → Secures HTTPS traffic
+
+---
+
+## Ingress vs Ingress Controller
+
+### Ingress (Kubernetes Object)
+
+Ingress is a **configuration layer**.
+
+It defines:
+
+- Host-based routing
+- Path-based routing
+- SSL/TLS rules
+
+Example:
+
+```bash
+/payment → payment-service
+/order → order-service
+/search → search-service
+```
+
+---
+
+👉 Important:
+
+- Ingress does NOT forward traffic
+- It only defines rules (YAML manifest)
+
+---
+
+### Ingress Controller (Actual Traffic Handler)
+
+Ingress Controller is the **real traffic processor**.
+
+It:
+
+- Watches Ingress rules
+- Reads routing configurations
+- Forwards traffic to Kubernetes Services
+
+👉 Important:
+
+- Kubernetes does NOT provide Ingress Controller by default
+- We must install it separately
+
+---
+
+## Types of Ingress Controllers
+
+### 1. Open Source Controllers
+
+- NGINX Ingress Controller
+- HAProxy Ingress Controller
+
+---
+
+### 2. Cloud-Based Controllers
+
+#### AWS
+
+- AWS Load Balancer Controller
+- Uses ALB (Application Load Balancer)
+
+Flow: Route 53 → ALB → Ingress Controller → Service → Pods
+
+---
+
+#### Azure
+
+- Azure Application Gateway Ingress Controller (AGIC)
+
+Flow: DNS → Application Gateway → Ingress → Service → Pods
+
+---
+
+## Kubernetes Service (Internal Load Balancer)
+
+A **Service (ClusterIP)** provides:
+
+- Stable internal IP
+- Load balancing across Pods
+- Service discovery
+
+### Example:
+
+```bash
+Payment Service
+├── Pod 1
+├── Pod 2
+└── Pod 3
+```
+
+---
+
+## Microservices Architecture
+
+In real production systems:
+
+- ~24 microservices exist
+- Each service has:
+  - Separate Deployment
+  - Separate Service
+  - Separate Database
+
+### Example:
+
+| Service         | Database   |
+| --------------- | ---------- |
+| payment-service | payment-db |
+| order-service   | order-db   |
+| user-service    | user-db    |
+
+### Benefits:
+
+- Loose coupling
+- Independent scaling
+- Fault isolation
+- Independent deployment
+
+---
+
+## Pod Architecture
+
+In production:
+
+Each Pod may contain:
+
+- Main Application Container
+- Sidecar Container
+
+### Sidecar Used For:
+
+- Logging
+- Monitoring
+- Metrics collection
+
+Tools:
+
+- Fluent Bit
+- Fluentd
+- Logstash
+- Filebeat
+
+---
+
+## Event-Driven Communication (SNS)
+
+AWS SNS is used for notifications:
+
+### Events:
+
+- Payment success/failure
+- Pod crash
+- Deployment failure
+- CPU/memory alerts
+
+### Flow: Microservice → SNS Topic → Slack / Email / Teams
+
+---
+
+## Infrastructure (Terraform + EKS)
+
+### Terraform Manages:
+
+- EKS Cluster
+- Worker Nodes
+- VPC Networking
+- IAM Roles
+- Security Groups
+- Auto Scaling
+
+---
+
+### EKS (Elastic Kubernetes Service)
+
+- AWS manages Control Plane
+- We manage Worker Nodes
+
+---
+
+## Auto Scaling & High Availability
+
+### Auto Scaling:
+
+- Adds nodes during high traffic
+- Removes nodes during low traffic
+
+### Multi-AZ Setup:
+
+- AZ-1
+- AZ-2
+- AZ-3
+
+### Benefits:
+
+- High availability
+- Fault tolerance
+- Disaster recovery
+
+---
+
+## Flow
+
+> When a user accesses Zomato.com, the DNS request first goes to Route 53. In Route 53, we configure DNS records such as A Record, CNAME, Alias Record, and TLS/SSL configurations for secure HTTPS communication.
+
+---
+
+> Route 53 resolves the domain and forwards traffic to the Ingress Controller. The Ingress Controller reads the rules defined in the Kubernetes Ingress resource and routes traffic to the appropriate Kubernetes Service based on host-based or path-based routing rules.
+
+---
+
+> Each Kubernetes Service has a stable ClusterIP and load-balances traffic across multiple Pods. In our real-time environment, each Pod generally contains two containers: a Main Application Container and a Sidecar Container used for log collection and monitoring.
+
+---
+
+> We have around 24 microservices in our environment, and each microservice maintains its own dedicated database for loose coupling and independent scalability.
+
+---
+
+> Whenever important events occur, microservices publish messages to AWS SNS topics, and notifications are delivered through Slack, Microsoft Teams, and Email for monitoring and alerting.
+
+---
+
+> Our Kubernetes infrastructure is provisioned using Terraform with CI/CD pipelines. We use AWS EKS for cluster management, deploy across multiple Availability Zones for high availability, and use auto scaling to dynamically increase or decrease worker nodes based on traffic demand.
+
+---
+
+## How We Maintain Environments in Kubernetes (Point-wise)
+
+### 1. Separate Environments
+
+- We maintain separate Kubernetes clusters for:
+  - Dev
+  - QA
+  - UAT
+  - Production
+- Ensures environment isolation and avoids production impact.
+
+---
+
+### 2. Multi-AZ Deployment
+
+- Clusters are deployed across multiple Availability Zones:
+  - AZ-1
+  - AZ-2
+  - AZ-3
+- Provides high availability and fault tolerance.
+
+---
+
+### 3. Production Worker Nodes
+
+- Around 5 worker nodes run in production during normal load.
+- Nodes are distributed across multiple AZs.
+- Ensures stability and redundancy.
+
+---
+
+### 4. Cluster Autoscaler (Node Level Scaling)
+
+- Automatically manages worker nodes.
+- Scales up when traffic increases.
+- Scales down during low traffic.
+- Helps optimize cost and resource usage.
+
+---
+
+### 5. Horizontal Pod Autoscaler (HPA)
+
+- Handles scaling at the pod level.
+- Based on:
+  - CPU utilization
+  - Memory utilization
+- Increases or decreases pod replicas dynamically.
+
+---
+
+### 6. Instance Types Used
+
+- **M Family Instances**
+  - General purpose workloads
+  - Balanced CPU and memory
+
+- **C Family Instances**
+  - Compute-intensive applications
+  - High CPU performance workloads
+
+---
+
+### 7. Benefits of This Setup
+
+- High availability
+- Fault tolerance
+- Cost optimization
+- Independent environment management
+- Better scalability
+
+## Interview Answer: How many microservices are you maintaining?
+
+- We have around **24 microservices** running in our Kubernetes platform.
+
+---
+
+### My Responsibility
+
+- I am directly responsible for **5 business-critical microservices**.
+
+---
+
+### What I Manage for These Services
+
+- Ensuring **high availability** of services
+- Monitoring application health and performance
+- Handling **deployments and releases**
+- Managing **scaling (HPA / autoscaling)**
+- Troubleshooting production issues
+- Performing **incident management and resolution**
+- Providing **production support**
+
+---
+
+### Summary
+
+- Total microservices in platform: **24**
+- Personally managed services: **5 critical microservices**
+- Focus: **stability, reliability, monitoring, and production support**
+
+---
+
+## Interview Answer: How do you maintain Environment and SNS?
+
+---
+
+### 1. Environment Management (Microservices Architecture)
+
+- We follow a **microservices-based architecture**.
+- Each microservice has its **own dedicated database**.
+
+#### Benefits:
+
+- Loose coupling between services
+- Independent scalability
+- Fault isolation (one service failure does not impact others)
+- Independent deployment and maintenance
+
+---
+
+### 2. Environment Isolation
+
+- We maintain separate environments:
+  - Dev
+  - QA
+  - UAT
+  - Production
+- Each environment is deployed in separate Kubernetes clusters.
+- This ensures stability and avoids production impact.
+
+---
+
+### 3. Monitoring & Alerting Using AWS SNS
+
+- We use **AWS SNS (Simple Notification Service)** for event-driven communication and alerting.
+
+---
+
+### 4. How SNS Works in Our System
+
+- Microservices publish messages to **SNS topics** when events occur.
+
+#### Events include:
+
+- Application errors
+- Deployment failures
+- Pod crashes
+- Infrastructure alerts
+- Business events (payment success/failure, order updates)
+
+---
+
+### 5. Notification Flow
+
+```bash
+Microservices
+↓
+AWS SNS Topic
+↓
+Slack / Microsoft Teams / Email
+```
+
+---
+
+### 6. Benefits of Using SNS
+
+- Real-time alerting
+- Faster incident response
+- Centralized notification system
+- Multi-channel communication (Slack, Teams, Email)
+- Improved system observability
+
+---
+
+### Summary
+
+> We maintain a well-isolated microservices environment where each service has its own database for scalability and fault isolation. For monitoring and alerting, we use AWS SNS, which publishes events from microservices to multiple channels like Slack, Microsoft Teams, and Email. This ensures quick detection and resolution of production issues.
+
+---
+
+## Interview Answer: How do you maintain infrastructure using Terraform?
+
+---
+
+### 1. Terraform Usage
+
+- We use **Terraform (Infrastructure as Code)** to manage AWS infrastructure.
+- Our Kubernetes platform runs on **AWS EKS**.
+
+---
+
+### 2. AWS Responsibility Split
+
+- AWS manages:
+  - EKS Control Plane (Master nodes)
+
+- We manage using Terraform:
+  - Worker Nodes
+  - VPC Networking
+  - Subnets
+  - IAM Roles & Policies
+  - Security Groups
+  - Storage (EBS / EFS)
+
+---
+
+### 3. Reusable Modules
+
+- We use Terraform **modules** for reusability:
+  - EKS cluster setup
+  - Node groups
+  - Networking
+  - IAM roles
+  - Security groups
+  - Storage resources
+
+---
+
+### 4. CI/CD Integration
+
+- Terraform is integrated with CI/CD pipelines.
+- Pipeline runs:
+  - `terraform plan`
+  - `terraform apply`
+
+#### Benefits:
+
+- Automation
+- Version control
+- Consistency
+- Reduced manual errors
+
+---
+
+### 5. Cluster Configuration
+
+- Node groups setup
+- Auto Scaling configuration
+- Multi-AZ deployment (AZ-1, AZ-2, AZ-3)
+- Security policies and storage provisioning
+
+---
+
+### 6. Summary
+
+> We manage AWS infrastructure using Terraform modules integrated with CI/CD pipelines to provision EKS clusters, networking, IAM roles, and auto scaling in a fully automated and version-controlled way.
+
+---
+
+## Interview Answer: Ingress Flow in Kubernetes (Zomato Example)
+
+---
+
+### 1. End-to-End Request Flow
+
+> User → Route 53 → ALB → Ingress Controller → Ingress Resource → Service → Pods
+
+---
+
+## 2. Route 53 Role
+
+- Handles DNS resolution for domain (e.g., zomato.com)
+- Uses records like:
+  - A Record
+  - CNAME Record
+  - Alias Record
+- Supports TLS/SSL (HTTPS) via ACM
+
+---
+
+## 3. Ingress (Kubernetes Resource)
+
+- Defines routing rules
+- Supports:
+  - Host-based routing
+  - Path-based routing
+
+### Important:
+
+- Ingress does NOT forward traffic
+- It only defines rules
+
+---
+
+## 4. Ingress Controller
+
+- Responsible for actual traffic routing
+- Reads Ingress rules
+- Forwards traffic to Services
+
+Examples:
+
+- NGINX Ingress Controller
+- HAProxy Ingress Controller
+- AWS Load Balancer Controller (ALB)
+
+---
+
+## 5. Service Layer
+
+- Each Service has a stable ClusterIP
+- Service load balances traffic across multiple Pods
+
+---
+
+## 6. Cloud-Based Ingress Options
+
+- AWS → ALB Ingress Controller
+- Azure → AGIC (Application Gateway Ingress Controller)
+
+---
+
+## 7. Summary
+
+> In Kubernetes, Route 53 resolves the domain and sends traffic to ALB, which forwards it to the Ingress Controller. The Ingress Controller reads routing rules and forwards traffic to Services, which distribute requests across multiple Pods.
+
+---
+
+# Kubernates Ingress Flow
+
+![Kubernates Ingress Flow](./images/ingress-DB-SNS.png)
 
 ---

@@ -6437,7 +6437,7 @@ http://<LoadBalancer-IP>
 
 # Kubernetes Deployment Setup Using eksctl
 
-[Kubernetes Deployment Setup Using eksctl](./images/Kubernetes-deployment-setup-using-eksctl.png)
+![Kubernetes Deployment Setup Using eksctl](./images/Kubernetes-deployment-setup-using-eksctl.png)
 
 ---
 
@@ -6974,7 +6974,7 @@ This project demonstrates:
 
 # Kubernetes Namespace Integration with EKSCTL Deployment and Rollout
 
-[Kubernetes Namespace Integration with EKSCTL Deployment and Rollout](./images/deployement-rollingupdate-namespace.png)
+![Kubernetes Namespace Integration with EKSCTL Deployment and Rollout](./images/deployement-rollingupdate-namespace.png)
 
 ---
 
@@ -7401,7 +7401,7 @@ This project demonstrates:
 
 # Implementation of Annotation Using Deployment
 
-[Implementation of Annotation Using Deployment](./images/deployment-annotations-namepace.png)
+![Implementation of Annotation Using Deployment](./images/deployment-annotations-namepace.png)
 
 ---
 
@@ -7876,6 +7876,6 @@ This project demonstrates:
 
 # Kubernates statefullset
 
-[Kubernates statefullset](./images/k8s-statefulset.png)
+![Kubernates statefullset](./images/k8s-statefulset.png)
 
 ---

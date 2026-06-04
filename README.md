@@ -17,7 +17,7 @@
       - [Used In:](#used-in)
       - [Provides:](#provides)
   - [🖥️ Self-Hosted Kubernetes Cluster](#️-self-hosted-kubernetes-cluster)
-    - [Tools:](#tools)
+      - [Tools:](#tools)
   - [☁️ Cloud Hosted Kubernetes Services](#️-cloud-hosted-kubernetes-services)
   - [✅ Summary](#-summary)
 - [☸️ Kubernetes Architecture (K8s)](#️-kubernetes-architecture-k8s)
@@ -261,7 +261,7 @@
     - [2. OnFailure](#2-onfailure)
     - [3. Never](#3-never)
 - [Kubernates Restart Policy](#kubernates-restart-policy)
-  - [Summary](#summary-5)
+    - [Summary](#summary-5)
 - [Kubernetes Pod Probes (Startup Probe)](#kubernetes-pod-probes-startup-probe)
   - [Overview](#overview-1)
   - [Types of Probes](#types-of-probes)
@@ -315,7 +315,7 @@
     - [Option 2: Reduce Application Memory Usage](#option-2-reduce-application-memory-usage)
     - [Option 3: Tune Application Settings](#option-3-tune-application-settings)
 - [Summary](#summary-7)
-  - [Main Troubleshooting Flow](#main-troubleshooting-flow)
+    - [Main Troubleshooting Flow](#main-troubleshooting-flow)
 - [Kubernates-OOMKill-Troubleshoot-Steps](#kubernates-oomkill-troubleshoot-steps)
 - [Kubernetes Resource Limits – Successful Run Example](#kubernetes-resource-limits--successful-run-example)
   - [Scenario](#scenario-1)
@@ -839,6 +839,161 @@
   - [6. Cloud-Based Ingress Options](#6-cloud-based-ingress-options)
   - [7. Summary](#7-summary)
 - [Kubernates Ingress Flow](#kubernates-ingress-flow)
+- [Kubernetes Ingress Implementation using AWS ECR](#kubernetes-ingress-implementation-using-aws-ecr)
+  - [Objective](#objective)
+- [Prerequisites](#prerequisites-1)
+    - [Step 1: Launch EC2 Instance](#step-1-launch-ec2-instance)
+    - [Step 2: Install AWS CLI](#step-2-install-aws-cli-1)
+    - [Step 3: Install Docker](#step-3-install-docker)
+    - [Step 4: Create Sample HTML Application](#step-4-create-sample-html-application)
+    - [Step 5: Scan Docker Image using Trivy](#step-5-scan-docker-image-using-trivy)
+    - [Step 6: Create AWS ECR Repository](#step-6-create-aws-ecr-repository)
+    - [Step 7: Push Docker Images to ECR](#step-7-push-docker-images-to-ecr)
+- [Kubernetes Manifests](#kubernetes-manifests)
+  - [deployment-mochi.yaml](#deployment-mochiyaml)
+  - [deployment-puppy.yaml](#deployment-puppyyaml)
+  - [service-mochi.yaml](#service-mochiyaml)
+  - [service-puppy.yaml](#service-puppyyaml)
+  - [ingress.yaml](#ingressyaml)
+- [Deployment Steps](#deployment-steps)
+    - [Create Namespace](#create-namespace-1)
+    - [Apply All Kubernetes Manifests](#apply-all-kubernetes-manifests)
+    - [Verify Resources](#verify-resources-2)
+- [Useful Commands](#useful-commands-1)
+    - [View Pods](#view-pods)
+    - [View Services](#view-services)
+    - [View Deployments](#view-deployments)
+    - [View Ingress](#view-ingress)
+    - [Describe Ingress](#describe-ingress)
+- [Expected Output](#expected-output)
+- [AWS EKS Ingress Controller Setup with AWS Load Balancer Controller](#aws-eks-ingress-controller-setup-with-aws-load-balancer-controller)
+  - [Objective](#objective-1)
+  - [Step 1: Create EC2 Instance](#step-1-create-ec2-instance-1)
+  - [Step 2: Install AWS CLI](#step-2-install-aws-cli-2)
+  - [Step 3: Install Docker](#step-3-install-docker-1)
+  - [Step 4: Add Ubuntu User to Docker Group](#step-4-add-ubuntu-user-to-docker-group)
+  - [Step 5: Create Dockerfile](#step-5-create-dockerfile)
+  - [Step 6: Build Docker Image](#step-6-build-docker-image)
+  - [Step 7: Verify Docker Images](#step-7-verify-docker-images)
+  - [Step 8: Create Docker Container](#step-8-create-docker-container)
+  - [Step 9: Verify Application](#step-9-verify-application)
+  - [Step 10: Install kubectl](#step-10-install-kubectl)
+  - [Step 11: Install eksctl](#step-11-install-eksctl)
+  - [Step 12: Create EKS Cluster](#step-12-create-eks-cluster)
+  - [Step 13: Create IAM Policy for AWS Load Balancer Controller](#step-13-create-iam-policy-for-aws-load-balancer-controller)
+  - [Step 14: Create IAM Service Account](#step-14-create-iam-service-account)
+    - [Associate IAM OIDC Provider](#associate-iam-oidc-provider)
+    - [Create Service Account](#create-service-account)
+  - [Step 15: Verify Service Account](#step-15-verify-service-account)
+  - [Step 16: Install Helm](#step-16-install-helm)
+  - [Step 17: Install AWS Load Balancer Controller](#step-17-install-aws-load-balancer-controller)
+  - [Step 18: Deploy Kubernetes Resources](#step-18-deploy-kubernetes-resources)
+  - [Step 19: Deploy Applications](#step-19-deploy-applications)
+  - [Step 20: Configure Amazon Route 53](#step-20-configure-amazon-route-53)
+  - [Step 21: Create DNS Records](#step-21-create-dns-records)
+    - [Path-Based Routing](#path-based-routing)
+    - [Host-Based Routing](#host-based-routing)
+  - [Verification Commands](#verification-commands)
+  - [Expected Result](#expected-result)
+- [AWS Load Balancer and Route 53 Routing Policies](#aws-load-balancer-and-route-53-routing-policies)
+  - [Load Balancer](#load-balancer)
+    - [How it Works](#how-it-works-1)
+    - [Example](#example-13)
+    - [Benefits](#benefits-5)
+- [Amazon Route 53](#amazon-route-53)
+    - [Example](#example-14)
+- [Route 53 Routing Policies](#route-53-routing-policies)
+  - [1. Simple Routing Policy](#1-simple-routing-policy)
+    - [Architecture](#architecture-2)
+    - [Example](#example-15)
+    - [Use Cases](#use-cases)
+    - [Benefits](#benefits-6)
+  - [2. Weighted Routing Policy](#2-weighted-routing-policy)
+    - [Example](#example-16)
+    - [Architecture](#architecture-3)
+    - [Real-Time Example](#real-time-example-5)
+    - [Use Cases](#use-cases-1)
+    - [Benefits](#benefits-7)
+  - [3. Geolocation Routing Policy](#3-geolocation-routing-policy)
+    - [Example](#example-17)
+    - [Architecture](#architecture-4)
+    - [Failover Scenario](#failover-scenario)
+    - [Benefits](#benefits-8)
+    - [Real-Time Example](#real-time-example-6)
+  - [4. Latency Routing Policy](#4-latency-routing-policy)
+    - [Example](#example-18)
+    - [Architecture](#architecture-5)
+    - [Real-Time Example](#real-time-example-7)
+    - [Benefits](#benefits-9)
+    - [Customer Perspective](#customer-perspective)
+- [Summary](#summary-16)
+    - [Interview Question](#interview-question)
+- [Persistent Volume (PV)](#persistent-volume-pv)
+  - [Definition](#definition-19)
+  - [Purpose](#purpose-5)
+  - [Static Provisioning](#static-provisioning)
+- [Persistent Volume Claim (PVC)](#persistent-volume-claim-pvc)
+  - [Definition](#definition-20)
+- [StorageClass](#storageclass)
+  - [Definition](#definition-21)
+    - [Examples](#examples-1)
+- [Complete Flow](#complete-flow)
+  - [Static Provisioning](#static-provisioning-1)
+  - [Dynamic Provisioning](#dynamic-provisioning)
+- [Real-Time Example](#real-time-example-8)
+- [volumeBindingMode](#volumebindingmode)
+  - [Definition](#definition-22)
+  - [Types of volumeBindingMode](#types-of-volumebindingmode)
+    - [Immediate](#immediate)
+      - [Flow](#flow-3)
+      - [Use Case](#use-case)
+    - [WaitForFirstConsumer](#waitforfirstconsumer)
+      - [Flow](#flow-4)
+      - [Use Case](#use-case-1)
+- [Real-Time Example](#real-time-example-9)
+- [Summary](#summary-17)
+- [Static vs Dynamic Provisioning in Kubernetes](#static-vs-dynamic-provisioning-in-kubernetes)
+  - [Definition](#definition-23)
+- [1. Static Provisioning](#1-static-provisioning)
+  - [Definition](#definition-24)
+  - [Purpose](#purpose-6)
+  - [Flow](#flow-5)
+  - [Real-Time Example](#real-time-example-10)
+- [2. Dynamic Provisioning](#2-dynamic-provisioning)
+  - [Definition](#definition-25)
+  - [Purpose](#purpose-7)
+  - [Flow](#flow-6)
+  - [Real-Time Example](#real-time-example-11)
+- [Comparison](#comparison)
+- [Summary](#summary-18)
+    - [Static Provisioning](#static-provisioning-2)
+    - [Dynamic Provisioning](#dynamic-provisioning-1)
+    - [Recommended](#recommended)
+- [Dynamic Provisioning with AWS EBS CSI Driver in EKS](#dynamic-provisioning-with-aws-ebs-csi-driver-in-eks)
+  - [Objective](#objective-2)
+- [Prerequisites](#prerequisites-2)
+- [Step 1: Create EC2 Instance](#step-1-create-ec2-instance-2)
+- [Step 2: Install AWS CLI](#step-2-install-aws-cli-3)
+- [Step 3: Install kubectl](#step-3-install-kubectl)
+- [Step 4: Install eksctl and Create EKS Cluster](#step-4-install-eksctl-and-create-eks-cluster)
+- [Step 5: Associate IAM OIDC Provider](#step-5-associate-iam-oidc-provider)
+- [Step 6: Create IAM Service Account for EBS CSI Driver](#step-6-create-iam-service-account-for-ebs-csi-driver)
+- [Step 7: Install AWS EBS CSI Driver Add-on](#step-7-install-aws-ebs-csi-driver-add-on)
+- [Step 8: Verify Add-on](#step-8-verify-add-on)
+- [Step 9: Verify CSI Drivers](#step-9-verify-csi-drivers)
+- [Step 10: Verify EBS CSI Pods](#step-10-verify-ebs-csi-pods)
+- [Step 11: Verify Storage Class](#step-11-verify-storage-class)
+- [Create Storage Class](#create-storage-class)
+  - [sc.yaml](#scyaml)
+- [Create Persistent Volume Claim](#create-persistent-volume-claim)
+  - [pvc.yaml](#pvcyaml)
+- [Create Deployment](#create-deployment)
+  - [dp.yaml](#dpyaml)
+- [Create Namespace](#create-namespace-2)
+- [Verify Dynamic Provisioning](#verify-dynamic-provisioning)
+- [Step 12: Verify Volume Inside Pod](#step-12-verify-volume-inside-pod)
+- [Complete Dynamic Provisioning Flow](#complete-dynamic-provisioning-flow)
+- [Conclusion](#conclusion-1)
 
 ---
 
@@ -9584,3 +9739,1956 @@ Examples:
 ![Kubernates Ingress Flow](./images/ingress-DB-SNS.png)
 
 ---
+
+# Kubernetes Ingress Implementation using AWS ECR
+
+## Objective
+
+Deploy multiple applications in Kubernetes and expose them using Ingress path-based routing.
+
+---
+
+# Prerequisites
+
+### Step 1: Launch EC2 Instance
+
+Create an EC2 instance and connect using SSH.
+
+```bash
+ssh ubuntu@<Public-IP>
+```
+
+---
+
+### Step 2: Install AWS CLI
+
+Install AWS CLI from the official AWS documentation and configure credentials.
+
+```bash
+aws configure
+```
+
+Provide:
+
+- AWS Access Key
+- AWS Secret Access Key
+- Region
+- Output Format
+
+---
+
+### Step 3: Install Docker
+
+Install Docker using the official Docker documentation.
+
+Verify installation:
+
+```bash
+docker --version
+```
+
+---
+
+### Step 4: Create Sample HTML Application
+
+Create a simple HTML page and Dockerfile.
+
+Example Dockerfile:
+
+```dockerfile
+FROM nginx:latest
+
+COPY index.html /usr/share/nginx/html/index.html
+
+EXPOSE 80
+```
+
+Build the image:
+
+```bash
+docker build -t mochi:1.0 .
+```
+
+Run the container:
+
+```bash
+docker run -d -p 80:80 mochi:1.0
+```
+
+Verify application accessibility.
+
+---
+
+### Step 5: Scan Docker Image using Trivy
+
+Install Trivy and scan image vulnerabilities.
+
+```bash
+trivy image mochi:1.0
+```
+
+---
+
+### Step 6: Create AWS ECR Repository
+
+Create repositories in ECR.
+
+Example:
+
+```bash
+aws ecr create-repository --repository-name prod/mochi
+aws ecr create-repository --repository-name prod/puppy
+```
+
+---
+
+### Step 7: Push Docker Images to ECR
+
+Navigate to:
+
+**AWS Console → ECR → Repository → View Push Commands**
+
+Execute the generated commands.
+
+Example:
+
+```bash
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.ap-south-1.amazonaws.com
+
+docker tag mochi:1.0 <account-id>.dkr.ecr.ap-south-1.amazonaws.com/prod/mochi:1.0
+
+docker push <account-id>.dkr.ecr.ap-south-1.amazonaws.com/prod/mochi:1.0
+```
+
+Repeat the same process for the Puppy application.
+
+---
+
+# Kubernetes Manifests
+
+## deployment-mochi.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mochi
+  namespace: prod
+  annotations:
+    kubernetes.io/change-cause: "Deploy in mochi"
+spec:
+  minReadySeconds: 5
+  replicas: 5
+  selector:
+    matchLabels:
+      app: mochi-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      name: mochi-pod
+      labels:
+        app: mochi-app
+    spec:
+      containers:
+        - name: mochi-container
+          image: 984912521466.dkr.ecr.ap-south-1.amazonaws.com/prod/mochi:1.0
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+```
+
+---
+
+## deployment-puppy.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: puppy
+  namespace: prod
+  annotations:
+    kubernetes.io/change-cause: "Deploy in puppy"
+spec:
+  minReadySeconds: 5
+  replicas: 5
+  selector:
+    matchLabels:
+      app: puppy-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      name: puppy-pod
+      labels:
+        app: puppy-app
+    spec:
+      containers:
+        - name: puppy-container
+          image: 984912521466.dkr.ecr.ap-south-1.amazonaws.com/prod/puppy:1.0
+          ports:
+            - containerPort: 80
+          imagePullPolicy: Always
+```
+
+---
+
+## service-mochi.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mochi-svc-deployment
+  namespace: prod
+spec:
+  type: ClusterIP
+  selector:
+    app: mochi-app
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+```
+
+---
+
+## service-puppy.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: puppy-svc-deployment
+  namespace: prod
+spec:
+  type: ClusterIP
+  selector:
+    app: puppy-app
+  ports:
+    - port: 80
+      protocol: TCP
+      targetPort: 80
+```
+
+---
+
+## ingress.yaml
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-prod-app
+  namespace: prod
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /mochi
+            pathType: Prefix
+            backend:
+              service:
+                name: mochi-svc-deployment
+                port:
+                  number: 80
+
+          - path: /puppy
+            pathType: Prefix
+            backend:
+              service:
+                name: puppy-svc-deployment
+                port:
+                  number: 80
+```
+
+---
+
+# Deployment Steps
+
+### Create Namespace
+
+```bash
+kubectl create namespace prod
+```
+
+---
+
+### Apply All Kubernetes Manifests
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+### Verify Resources
+
+Check Pods:
+
+```bash
+kubectl get pods -n prod
+```
+
+Check Deployments:
+
+```bash
+kubectl get deployment -n prod
+```
+
+Check Services:
+
+```bash
+kubectl get svc -n prod
+```
+
+Check Ingress:
+
+```bash
+kubectl get ingress -n prod
+```
+
+---
+
+# Useful Commands
+
+### View Pods
+
+```bash
+kubectl get po -n prod
+```
+
+### View Services
+
+```bash
+kubectl get svc -n prod
+```
+
+### View Deployments
+
+```bash
+kubectl get deploy -n prod
+```
+
+### View Ingress
+
+```bash
+kubectl get ingress -n prod
+```
+
+### Describe Ingress
+
+```bash
+kubectl describe ingress ingress-prod-app -n prod
+```
+
+---
+
+# Expected Output
+
+After successful deployment:
+
+- `/mochi` path routes traffic to the Mochi application.
+- `/puppy` path routes traffic to the Puppy application.
+- Both applications are accessible through a single Ingress endpoint.
+
+Example:
+
+```text
+http://<Ingress-IP>/mochi
+http://<Ingress-IP>/puppy
+```
+
+---
+
+# AWS EKS Ingress Controller Setup with AWS Load Balancer Controller
+
+## Objective
+
+Deploy applications on Amazon EKS and expose them through an AWS Application Load Balancer (ALB) using the AWS Load Balancer Controller and Ingress resources.
+
+---
+
+## Step 1: Create EC2 Instance
+
+Create an EC2 instance and connect through SSH.
+
+```bash
+ssh ubuntu@<Public-IP>
+sudo apt update
+```
+
+---
+
+## Step 2: Install AWS CLI
+
+Install AWS CLI from the official documentation and configure credentials.
+
+```bash
+aws configure
+```
+
+Provide:
+
+- AWS Access Key
+- AWS Secret Access Key
+- Default Region
+- Output Format
+
+---
+
+## Step 3: Install Docker
+
+Install Docker from the official documentation.
+
+Verify installation:
+
+```bash
+docker --version
+```
+
+---
+
+## Step 4: Add Ubuntu User to Docker Group
+
+```bash
+sudo usermod -aG docker ubuntu
+newgrp docker
+```
+
+---
+
+## Step 5: Create Dockerfile
+
+Example Dockerfile:
+
+```dockerfile
+FROM nginx:latest
+COPY index.html /usr/share/nginx/html/index.html
+EXPOSE 80
+```
+
+---
+
+## Step 6: Build Docker Image
+
+```bash
+docker image build -t <Image-Name> .
+```
+
+Example:
+
+```bash
+docker image build -t mochi:1.0 .
+docker image build -t puppy:1.0 .
+```
+
+---
+
+## Step 7: Verify Docker Images
+
+```bash
+docker image ls
+```
+
+---
+
+## Step 8: Create Docker Container
+
+```bash
+docker container run -d -P --name <Container-Name> <Image-Name>
+```
+
+Example:
+
+```bash
+docker container run -d -P --name mochi-container mochi:1.0
+docker container run -d -P --name puppy-container puppy:1.0
+```
+
+---
+
+## Step 9: Verify Application
+
+Check running containers:
+
+```bash
+docker ps
+```
+
+Access application:
+
+```text
+http://<Public-IP>:<Port-No>
+```
+
+---
+
+## Step 10: Install kubectl
+
+Install kubectl from the official Kubernetes documentation.
+
+Verify installation:
+
+```bash
+kubectl version --client
+```
+
+---
+
+## Step 11: Install eksctl
+
+Install eksctl from the official documentation.
+
+Verify installation:
+
+```bash
+eksctl version
+```
+
+---
+
+## Step 12: Create EKS Cluster
+
+```bash
+eksctl create cluster my-cluster \
+--region ap-south-1 \
+--node-type m7i-flex.large \
+--nodes 1
+```
+
+Verify cluster:
+
+```bash
+kubectl get nodes
+```
+
+---
+
+## Step 13: Create IAM Policy for AWS Load Balancer Controller
+
+Download IAM policy:
+
+```bash
+curl -o iam-policy.json https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.9.0/docs/install/iam_policy.json
+```
+
+Create IAM policy:
+
+```bash
+aws iam create-policy \
+--policy-name AWSLoadBalancerControllerIAMPolicy \
+--policy-document file://iam-policy.json
+```
+
+Example Output:
+
+```json
+{
+  "Policy": {
+    "PolicyName": "AWSLoadBalancerControllerIAMPolicy",
+    "Arn": "arn:aws:iam::<Account-ID>:policy/AWSLoadBalancerControllerIAMPolicy"
+  }
+}
+```
+
+> Save the generated Policy ARN. It will be required in the next step.
+
+---
+
+## Step 14: Create IAM Service Account
+
+### Associate IAM OIDC Provider
+
+```bash
+eksctl utils associate-iam-oidc-provider \
+--region ap-south-1 \
+--cluster my-cluster \
+--approve
+```
+
+### Create Service Account
+
+```bash
+eksctl create iamserviceaccount \
+--cluster my-cluster \
+--namespace kube-system \
+--name aws-load-balancer-controller \
+--attach-policy-arn arn:aws:iam::<Account-ID>:policy/AWSLoadBalancerControllerIAMPolicy \
+--override-existing-serviceaccounts \
+--region ap-south-1 \
+--approve
+```
+
+---
+
+## Step 15: Verify Service Account
+
+```bash
+kubectl get sa aws-load-balancer-controller -n kube-system -o yaml
+```
+
+---
+
+## Step 16: Install Helm
+
+```bash
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+```
+
+Verify installation:
+
+```bash
+helm version
+```
+
+---
+
+## Step 17: Install AWS Load Balancer Controller
+
+Add Helm Repository:
+
+```bash
+helm repo add eks https://aws.github.io/eks-charts
+helm repo update
+```
+
+Get VPC ID:
+
+```bash
+aws eks describe-cluster \
+--name my-cluster \
+--query "cluster.resourcesVpcConfig.vpcId" \
+--output text
+```
+
+Install Controller:
+
+```bash
+helm upgrade -i aws-load-balancer-controller eks/aws-load-balancer-controller \
+-n kube-system \
+--set clusterName=my-cluster \
+--set region=ap-south-1 \
+--set vpcId=<VPC-ID> \
+--set serviceAccount.create=false \
+--set serviceAccount.name=aws-load-balancer-controller
+```
+
+Verify Installation:
+
+```bash
+kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+
+---
+
+## Step 18: Deploy Kubernetes Resources
+
+Create the following files:
+
+- deployment-mochi.yaml
+- deployment-puppy.yaml
+- service-mochi.yaml
+- service-puppy.yaml
+- ingress.yaml
+
+Apply the files:
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+## Step 19: Deploy Applications
+
+Create Namespace:
+
+```bash
+kubectl create namespace <Namespace-Name>
+```
+
+Check Namespace:
+
+```bash
+kubectl get ns
+```
+
+Set Namespace:
+
+```bash
+kubectl config set-context --current --namespace=<Namespace-Name>
+```
+
+Apply Resources:
+
+```bash
+kubectl apply -f .
+```
+
+Verify Resources:
+
+```bash
+kubectl get all
+kubectl get po
+kubectl get svc
+kubectl get ingress
+```
+
+---
+
+## Step 20: Configure Amazon Route 53
+
+1. Open AWS Route 53.
+2. Create a Hosted Zone using your domain name.
+3. Route 53 will generate four unique Name Servers.
+4. Copy the Name Servers.
+5. Login to your domain registrar (GoDaddy, Namecheap, Hostinger, etc.).
+6. Replace the existing Name Servers with the Route 53 Name Servers.
+7. Wait for DNS propagation.
+
+Example:
+
+```text
+ns-123.awsdns-01.com
+ns-456.awsdns-02.net
+ns-789.awsdns-03.org
+ns-321.awsdns-04.co.uk
+```
+
+---
+
+## Step 21: Create DNS Records
+
+### Path-Based Routing
+
+Access applications using:
+
+```text
+http://<Domain-Name>/mochi
+http://<Domain-Name>/puppy
+```
+
+### Host-Based Routing
+
+Create records such as:
+
+```text
+mochi.<Domain-Name>
+puppy.<Domain-Name>
+```
+
+Access applications using:
+
+```text
+http://mochi.<Domain-Name>
+http://puppy.<Domain-Name>
+```
+
+---
+
+## Verification Commands
+
+Check Nodes:
+
+```bash
+kubectl get nodes
+```
+
+Check Pods:
+
+```bash
+kubectl get pods -A
+```
+
+Check Services:
+
+```bash
+kubectl get svc -A
+```
+
+Check Ingress:
+
+```bash
+kubectl get ingress -A
+```
+
+Check AWS Load Balancer Controller:
+
+```bash
+kubectl get deployment -n kube-system
+```
+
+Get ALB Address:
+
+```bash
+kubectl get ingress
+```
+
+Example Output:
+
+```text
+NAME               CLASS   HOSTS   ADDRESS
+ingress-prod-app   alb     *       k8s-prod-xxxx.ap-south-1.elb.amazonaws.com
+```
+
+---
+
+## Expected Result
+
+After successful implementation:
+
+- AWS Load Balancer Controller creates an Application Load Balancer (ALB).
+- Route 53 resolves the domain to the ALB.
+- Ingress routes traffic to the appropriate Kubernetes Services.
+- Applications are accessible through:
+
+```text
+http://<Domain-Name>/mochi
+http://<Domain-Name>/puppy
+```
+
+or
+
+```text
+http://mochi.<Domain-Name>
+http://puppy.<Domain-Name>
+```
+
+---
+
+# AWS Load Balancer and Route 53 Routing Policies
+
+## Load Balancer
+
+A **Load Balancer** is used to distribute incoming user traffic across multiple backend servers or services.
+
+It helps improve:
+
+- High Availability
+- Scalability
+- Fault Tolerance
+- Application Performance
+
+### How it Works
+
+When users access an application or website, the Load Balancer receives the request and forwards it to one of the healthy backend servers.
+
+### Example
+
+Suppose an e-commerce website has three application servers:
+
+- Server 1
+- Server 2
+- Server 3
+
+If 10,000 users access the website simultaneously, the Load Balancer distributes the traffic among all available servers instead of sending all requests to a single server.
+
+### Benefits
+
+- Prevents server overload
+- Improves response time
+- Provides high availability
+- Automatically redirects traffic if a server fails
+
+---
+
+# Amazon Route 53
+
+Amazon Route 53 is AWS's highly available and scalable DNS (Domain Name System) service.
+
+The primary role of Route 53 is to translate a domain name such as:
+
+```text
+www.example.com
+```
+
+into an IP address that computers can understand.
+
+### Example
+
+```text
+www.amazon.com  →  54.x.x.x
+www.google.com  →  142.x.x.x
+```
+
+Route 53 also supports multiple routing policies that allow traffic to be directed intelligently based on business requirements.
+
+---
+
+# Route 53 Routing Policies
+
+## 1. Simple Routing Policy
+
+Simple Routing is used when there is only one resource performing a specific function.
+
+### Architecture
+
+```text
+User
+  |
+Route 53
+  |
+Application Server / Load Balancer
+```
+
+### Example
+
+A company hosts a website on a single EC2 instance.
+
+When users access:
+
+```text
+www.company.com
+```
+
+Route 53 forwards all traffic to that single server.
+
+### Use Cases
+
+- Single application endpoint
+- Small websites
+- Basic DNS configuration
+
+### Benefits
+
+- Easy to configure
+- Low maintenance
+- Suitable for simple applications
+
+---
+
+## 2. Weighted Routing Policy
+
+Weighted Routing distributes traffic across multiple resources based on assigned weights.
+
+### Example
+
+Suppose there are two application servers:
+
+```text
+Server-A = Weight 80
+Server-B = Weight 20
+```
+
+Traffic distribution:
+
+```text
+80% → Server-A
+20% → Server-B
+```
+
+### Architecture
+
+```text
+             Route 53
+             /      \
+         80%         20%
+        /              \
+   Server-A        Server-B
+```
+
+### Real-Time Example
+
+During business hours:
+
+```text
+80% Traffic → Production Server
+20% Traffic → New Version Server
+```
+
+This allows testing a new application version with limited users.
+
+### Use Cases
+
+- Blue-Green Deployment
+- A/B Testing
+- Gradual Rollout
+- Canary Deployment
+
+### Benefits
+
+- Controlled traffic distribution
+- Safe application upgrades
+- Reduced deployment risk
+
+---
+
+## 3. Geolocation Routing Policy
+
+Geolocation Routing directs users based on their geographic location.
+
+### Example
+
+Users from different cities are routed to their nearest servers.
+
+```text
+Mumbai Users      → Mumbai Server
+Hyderabad Users   → Hyderabad Server
+Bangalore Users   → Bangalore Server
+Pune Users        → Pune Server
+Kolkata Users     → Kolkata Server
+```
+
+### Architecture
+
+```text
+Mumbai User      → Mumbai Server
+Hyderabad User   → Hyderabad Server
+Bangalore User   → Bangalore Server
+Pune User        → Pune Server
+Kolkata User     → Kolkata Server
+```
+
+### Failover Scenario
+
+Suppose the Pune server becomes unavailable:
+
+```text
+Pune Server Down
+      ↓
+Traffic Redirected
+      ↓
+Hyderabad Server
+```
+
+Users continue accessing the application without interruption.
+
+### Benefits
+
+- Reduced latency
+- Better user experience
+- Regional disaster recovery
+- Improved application availability
+
+### Real-Time Example
+
+A video streaming company hosts content in multiple cities.
+
+Users automatically connect to the nearest regional server for faster content delivery.
+
+---
+
+## 4. Latency Routing Policy
+
+Latency Routing directs users to the AWS Region that provides the lowest network latency.
+
+Latency means the time taken for a request to travel from the user to the server and receive a response.
+
+### Example
+
+Suppose application servers are running in:
+
+- Mumbai Region
+- Singapore Region
+- London Region
+
+Route 53 measures which region provides the fastest response and routes users accordingly.
+
+### Architecture
+
+```text
+User
+  |
+Route 53
+  |
+Lowest Latency Region
+  |
+Application Server
+```
+
+### Real-Time Example
+
+Consider a food delivery application.
+
+A customer orders Biryani through the mobile application.
+
+The application sends a request to the backend server.
+
+If:
+
+```text
+Mumbai Server Response Time = 30 ms
+Singapore Server Response Time = 90 ms
+London Server Response Time = 250 ms
+```
+
+Route 53 routes the request to the Mumbai server because it provides the lowest latency.
+
+### Benefits
+
+- Faster response time
+- Improved application performance
+- Better customer experience
+- Optimized network routing
+
+### Customer Perspective
+
+```text
+Fast Response  → Better Experience
+Slow Response  → Poor Experience
+```
+
+Therefore, latency-based routing ensures users are connected to the fastest available AWS Region.
+
+---
+
+# Summary
+
+| Routing Policy      | Purpose                        | Example Use Case      |
+| ------------------- | ------------------------------ | --------------------- |
+| Simple Routing      | Single Resource                | Small website         |
+| Weighted Routing    | Traffic Distribution by Weight | Blue-Green Deployment |
+| Geolocation Routing | Route Based on User Location   | Regional Applications |
+| Latency Routing     | Route to Lowest Latency Region | Global Applications   |
+
+### Interview Question
+
+**What is the difference between Geolocation Routing and Latency Routing?**
+
+**Geolocation Routing:** Routes users based on their physical location.
+
+Example:
+
+```text
+Mumbai User → Mumbai Server
+Hyderabad User → Hyderabad Server
+```
+
+**Latency Routing:** Routes users to the AWS Region with the lowest response time.
+
+Example:
+
+```text
+Mumbai User → Mumbai Region (30 ms)
+Singapore Region (90 ms)
+
+Traffic goes to Mumbai Region because it has lower latency.
+```
+
+---
+
+# Persistent Volume (PV)
+
+## Definition
+
+A Persistent Volume (PV) is a storage resource in Kubernetes that is provisioned and managed independently of Pods.
+
+## Purpose
+
+- Provides persistent storage for applications.
+- Data remains available even if Pods are deleted or recreated.
+- Separates storage lifecycle from Pod lifecycle.
+
+## Static Provisioning
+
+A PV is generally considered static storage because an administrator can create it manually before applications request it.
+
+A Persistent Volume (PV) is a cluster-level storage resource in Kubernetes. It exists independently of Pods and stores application data permanently. If a Pod is deleted, recreated, or moved to another node, the data remains safe in the PV.
+
+For example, if 100 GB of data is stored in a PV, deleting the Pod will not delete that data. The data remains available as long as the PV itself is not deleted according to its reclaim policy.
+
+---
+
+# Persistent Volume Claim (PVC)
+
+## Definition
+
+A Persistent Volume Claim (PVC) is a request for storage made by a Pod.
+
+A PVC acts as a bridge between the Pod and the Persistent Volume. Instead of directly accessing storage, the Pod requests storage through a PVC, and Kubernetes binds the PVC to a suitable PV.
+
+---
+
+# StorageClass
+
+## Definition
+
+A StorageClass enables dynamic provisioning of storage.
+
+A StorageClass automatically creates storage when a PVC requests it.
+
+### Examples
+
+- In AWS, the StorageClass can create an EBS Volume.
+- In Azure, the StorageClass can create an Azure Disk.
+
+---
+
+# Complete Flow
+
+## Static Provisioning
+
+```text
+Admin Creates PV (100GB)
+          ↓
+Application Creates PVC (50GB)
+          ↓
+PVC Binds to PV
+          ↓
+Pod Uses PVC
+```
+
+## Dynamic Provisioning
+
+```text
+Pod
+ ↓
+PVC (100GB Request)
+ ↓
+StorageClass
+ ↓
+AWS EBS / Azure Disk Created
+ ↓
+PV Created Automatically
+ ↓
+PVC Bound to PV
+```
+
+---
+
+# Real-Time Example
+
+- > Assume I have a database Pod storing 100 GB of customer data.
+
+- > The Pod uses a PVC, which is connected to a PV. If the Pod crashes, gets deleted, or is rescheduled to another worker node, the 100 GB data is not lost because it is stored in the Persistent Volume.
+
+- > The PV exists independently of the Pod lifecycle.
+
+When dynamic provisioning is used, a StorageClass automatically creates the underlying storage, such as:
+
+- AWS EBS Volume
+- Azure Disk
+
+- > This ensures that application data remains persistent and available even when Pods are recreated.
+
+---
+
+# volumeBindingMode
+
+## Definition
+
+`volumeBindingMode` controls when a Persistent Volume (PV) is provisioned and bound to a Persistent Volume Claim (PVC).
+
+It determines the timing of storage allocation and binding in Kubernetes.
+
+---
+
+## Types of volumeBindingMode
+
+### Immediate
+
+In `Immediate` mode, the Persistent Volume is provisioned and bound as soon as the PVC is created, regardless of whether a Pod exists or not.
+
+#### Flow
+
+```text
+PVC Created
+     ↓
+PV Provisioned
+     ↓
+PVC Bound to PV
+     ↓
+Pod Created Later
+```
+
+#### Use Case
+
+- Suitable when storage location does not depend on Pod scheduling.
+- Storage is allocated immediately after PVC creation.
+
+---
+
+### WaitForFirstConsumer
+
+In `WaitForFirstConsumer` mode, PV provisioning is delayed until a Pod that uses the PVC is scheduled.
+
+This allows Kubernetes to provision storage in the correct topology, availability zone, or node location where the Pod will run.
+
+#### Flow
+
+```text
+PVC Created
+     ↓
+PVC Waits
+     ↓
+Pod Created
+     ↓
+Pod Scheduled to Node
+     ↓
+PV Provisioned in Correct Zone
+     ↓
+PVC Bound to PV
+```
+
+#### Use Case
+
+- Recommended for cloud environments such as AWS, Azure, and GCP.
+- Ensures storage is created in the same Availability Zone as the Pod.
+- Prevents scheduling issues caused by storage being created in a different zone.
+
+---
+
+# Real-Time Example
+
+Suppose an EKS cluster has worker nodes in multiple Availability Zones:
+
+- ap-south-1a
+- ap-south-1b
+
+If `volumeBindingMode: Immediate` is used, an EBS volume may be created in `ap-south-1a` immediately after PVC creation. Later, Kubernetes may schedule the Pod on a node in `ap-south-1b`, causing attachment issues.
+
+If `volumeBindingMode: WaitForFirstConsumer` is used, Kubernetes first schedules the Pod and then creates the EBS volume in the same Availability Zone as the selected node, ensuring successful volume attachment.
+
+---
+
+# Summary
+
+| volumeBindingMode | Behavior |
+|-------------------|-----------|
+| Immediate | PV is provisioned and bound immediately when PVC is created |
+| WaitForFirstConsumer | PV provisioning waits until a Pod uses the PVC and is scheduled |
+
+**Recommended:** `WaitForFirstConsumer` for cloud-based Kubernetes clusters to avoid storage topology and Availability Zone issues.
+
+---
+
+# Static vs Dynamic Provisioning in Kubernetes
+
+## Definition
+
+Provisioning is the process of creating and allocating storage for applications running in Kubernetes.
+
+Kubernetes supports two types of provisioning:
+
+1. Static Provisioning
+2. Dynamic Provisioning
+
+---
+
+# 1. Static Provisioning
+
+## Definition
+
+In Static Provisioning, the administrator manually creates a Persistent Volume (PV) before any application requests storage.
+
+Users then create a Persistent Volume Claim (PVC), and Kubernetes binds the PVC to an existing matching PV.
+
+## Purpose
+
+- Administrator has full control over storage creation.
+- Storage is created before applications request it.
+- Suitable for environments where storage resources are managed manually.
+
+## Flow
+
+```text
+Admin Creates PV
+        ↓
+User Creates PVC
+        ↓
+PVC Binds to Existing PV
+        ↓
+Pod Uses PVC
+```
+
+## Real-Time Example
+
+Suppose an administrator manually creates a 100 GB Persistent Volume.
+
+A database application creates a PVC requesting 50 GB of storage.
+
+Kubernetes finds the existing PV and binds the PVC to it.
+
+The Pod then uses the PVC to access the storage.
+
+```text
+Admin Creates PV (100GB)
+        ↓
+Database PVC Requests (50GB)
+        ↓
+PVC Bound to Existing PV
+        ↓
+Database Pod Uses Storage
+```
+
+---
+
+# 2. Dynamic Provisioning
+
+## Definition
+
+In Dynamic Provisioning, Kubernetes automatically creates a Persistent Volume whenever a PVC requests storage.
+
+The PVC references a StorageClass, which defines how and where the storage should be created.
+
+## Purpose
+
+- Eliminates manual PV creation.
+- Automatically provisions storage when needed.
+- Simplifies storage management in cloud environments.
+
+## Flow
+
+```text
+PVC Created
+      ↓
+StorageClass
+      ↓
+PV Created Automatically
+      ↓
+PVC Bound to PV
+      ↓
+Pod Uses PVC
+```
+
+## Real-Time Example
+
+Suppose a database application requests 100 GB of storage using a PVC.
+
+The PVC references a StorageClass configured to create AWS EBS volumes.
+
+Kubernetes automatically:
+
+1. Creates an EBS volume.
+2. Creates a PV for that volume.
+3. Binds the PVC to the PV.
+4. Makes the storage available to the Pod.
+
+```text
+Database PVC (100GB)
+          ↓
+StorageClass (AWS EBS)
+          ↓
+EBS Volume Created
+          ↓
+PV Created Automatically
+          ↓
+PVC Bound to PV
+          ↓
+Database Pod Uses Storage
+```
+
+---
+
+# Comparison
+
+| Feature | Static Provisioning | Dynamic Provisioning |
+|----------|--------------------|----------------------|
+| PV Creation | Manual | Automatic |
+| Administrator Effort | High | Low |
+| Requires StorageClass | No | Yes |
+| Scalability | Limited | Highly Scalable |
+| Cloud Friendly | Less Preferred | Recommended |
+| Storage Allocation | Pre-created | On Demand |
+
+---
+
+# Summary
+
+### Static Provisioning
+
+```text
+Admin Creates PV
+        ↓
+User Creates PVC
+        ↓
+PVC Bound to Existing PV
+```
+
+### Dynamic Provisioning
+
+```text
+PVC
+ ↓
+StorageClass
+ ↓
+PV Created Automatically
+ ↓
+PVC Bound to PV
+```
+
+### Recommended
+
+Dynamic Provisioning is recommended for modern Kubernetes clusters because storage is automatically created when applications request it, reducing manual effort and improving scalability.
+
+---
+
+# Dynamic Provisioning with AWS EBS CSI Driver in EKS
+
+## Objective
+
+Configure Dynamic Provisioning in an EKS cluster using the AWS EBS CSI Driver so that Persistent Volumes (PVs) are created automatically whenever a Persistent Volume Claim (PVC) requests storage.
+
+---
+
+# Prerequisites
+
+- AWS Account
+- IAM User with Administrator Access
+- EC2 Instance (Ubuntu)
+- AWS CLI
+- kubectl
+- eksctl
+
+---
+
+# Step 1: Create EC2 Instance
+
+Create an Ubuntu EC2 instance and connect to it.
+
+```bash
+ssh ubuntu@<Public-IP>
+```
+
+---
+
+# Step 2: Install AWS CLI
+
+Install AWS CLI from the official AWS documentation.
+
+Configure AWS credentials:
+
+```bash
+aws configure
+```
+
+Provide:
+
+```text
+AWS Access Key ID
+AWS Secret Access Key
+Region
+Output Format
+```
+
+---
+
+# Step 3: Install kubectl
+
+Install kubectl from the official Kubernetes documentation.
+
+Verify installation:
+
+```bash
+kubectl version --client
+```
+
+---
+
+# Step 4: Install eksctl and Create EKS Cluster
+
+Install eksctl from the official documentation.
+
+Create cluster:
+
+```bash
+eksctl create cluster \
+--name <Cluster-Name> \
+--region <Region-Name> \
+--nodes <Node-Number> \
+--node-type <Instance-Type>
+```
+
+Example:
+
+```bash
+eksctl create cluster \
+--name my-cluster \
+--region ap-south-1 \
+--nodes 2 \
+--node-type t3.medium
+```
+
+---
+
+# Step 5: Associate IAM OIDC Provider
+
+```bash
+eksctl utils associate-iam-oidc-provider \
+--cluster my-cluster \
+--approve
+```
+
+Verify:
+
+```bash
+aws eks describe-cluster \
+--name my-cluster \
+--query "cluster.identity.oidc.issuer"
+```
+
+---
+
+# Step 6: Create IAM Service Account for EBS CSI Driver
+
+```bash
+eksctl create iamserviceaccount \
+--name ebs-csi-controller-sa \
+--namespace kube-system \
+--cluster my-cluster \
+--role-name AmazonEKS_EBS_CSI_DriverRole \
+--role-only \
+--attach-policy-arn arn:aws:iam::aws:policy/service-role/AmazonEBSCSIDriverPolicy \
+--approve
+```
+
+Check Role ARN:
+
+```bash
+aws iam get-role \
+--role-name AmazonEKS_EBS_CSI_DriverRole \
+--query 'Role.Arn' \
+--output text
+```
+
+---
+
+# Step 7: Install AWS EBS CSI Driver Add-on
+
+Check existing addons:
+
+```bash
+aws eks list-addons --cluster-name my-cluster
+```
+
+If `aws-ebs-csi-driver` is not available, create it.
+
+```bash
+aws eks create-addon \
+--cluster-name my-cluster \
+--addon-name aws-ebs-csi-driver \
+--service-account-role-arn arn:aws:iam::<ACCOUNT-ID>:role/AmazonEKS_EBS_CSI_DriverRole
+```
+
+---
+
+# Step 8: Verify Add-on
+
+```bash
+aws eks list-addons --cluster-name my-cluster
+```
+
+Expected Output:
+
+```text
+aws-ebs-csi-driver
+```
+
+---
+
+# Step 9: Verify CSI Drivers
+
+```bash
+kubectl get csidrivers
+```
+
+Expected Output:
+
+```text
+NAME              ATTACHREQUIRED   MODES
+ebs.csi.aws.com   true             Persistent
+efs.csi.aws.com   false            Persistent
+```
+
+---
+
+# Step 10: Verify EBS CSI Pods
+
+```bash
+kubectl get pods -n kube-system | grep ebs
+```
+
+Expected Output:
+
+```text
+ebs-csi-controller-xxxxx   Running
+ebs-csi-controller-xxxxx   Running
+ebs-csi-node-xxxxx         Running
+ebs-csi-node-xxxxx         Running
+```
+
+---
+
+# Step 11: Verify Storage Class
+
+```bash
+kubectl get sc
+```
+
+Expected Output:
+
+```text
+NAME   PROVISIONER        RECLAIMPOLICY   VOLUMEBINDINGMODE
+gp2    kubernetes.io/aws-ebs Delete       WaitForFirstConsumer
+```
+
+---
+
+# Create Storage Class
+
+## sc.yaml
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: my-sc-red-app
+
+provisioner: ebs.csi.aws.com
+
+volumeBindingMode: WaitForFirstConsumer
+
+parameters:
+  type: gp3
+```
+
+Apply:
+
+```bash
+kubectl apply -f sc.yaml
+```
+
+---
+
+# Create Persistent Volume Claim
+
+## pvc.yaml
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+
+metadata:
+  name: my-pvc-red-app
+  namespace: my-pvc-dev
+
+  labels:
+    env: dev
+
+spec:
+  accessModes:
+    - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: 5Gi
+
+  storageClassName: my-sc-red-app
+```
+
+Apply:
+
+```bash
+kubectl apply -f pvc.yaml
+```
+
+---
+
+# Create Deployment
+
+## dp.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: pod-dep
+  namespace: my-pvc-dev
+
+  annotations:
+    kubernetes.io/change-cause: "Deploy in redpage"
+
+spec:
+  minReadySeconds: 5
+
+  replicas: 5
+
+  selector:
+    matchLabels:
+      app: red-app
+
+  strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+
+  template:
+    metadata:
+      labels:
+        app: red-app
+
+    spec:
+      containers:
+      - name: red-con
+        image: opsbynikhil/redpage:REDPAGE
+
+        ports:
+        - containerPort: 80
+
+        volumeMounts:
+        - name: my-pvc-dp
+          mountPath: /usr/share/nginx/html
+
+      volumes:
+      - name: my-pvc-dp
+        persistentVolumeClaim:
+          claimName: my-pvc-red-app
+          readOnly: true
+```
+
+Apply:
+
+```bash
+kubectl apply -f dp.yaml
+```
+
+---
+
+# Create Namespace
+
+```bash
+kubectl create namespace my-pvc-dev
+```
+
+Set Default Namespace:
+
+```bash
+kubectl config set-context --current --namespace=my-pvc-dev
+```
+
+Deploy Resources:
+
+```bash
+kubectl apply -f .
+```
+
+---
+
+# Verify Dynamic Provisioning
+
+Check PVC:
+
+```bash
+kubectl get pvc
+```
+
+Check PV:
+
+```bash
+kubectl get pv
+```
+
+Check EBS Volume:
+
+```bash
+aws ec2 describe-volumes
+```
+
+You will notice that Kubernetes automatically creates:
+
+```text
+PVC
+ ↓
+StorageClass
+ ↓
+AWS EBS Volume
+ ↓
+Persistent Volume
+ ↓
+PVC Bound to PV
+```
+
+No manual PV creation is required.
+
+---
+
+# Step 12: Verify Volume Inside Pod
+
+Access Pod:
+
+```bash
+kubectl exec -it <POD-NAME> -- bash
+```
+
+Navigate to mounted path:
+
+```bash
+cd /usr/share/nginx/html
+```
+
+List files:
+
+```bash
+ls
+```
+
+Expected Output:
+
+```text
+lost+found
+```
+
+Check mounted storage:
+
+```bash
+df -h
+```
+
+Expected Output:
+
+```text
+Filesystem      Size
+/dev/nvme1n1    4.9G
+```
+
+This confirms that the AWS EBS volume is successfully mounted inside the Pod.
+
+---
+
+# Complete Dynamic Provisioning Flow
+
+```text
+PVC Created
+      ↓
+StorageClass
+      ↓
+AWS EBS Volume Created
+      ↓
+PV Created Automatically
+      ↓
+PVC Bound to PV
+      ↓
+Pod Uses PVC
+      ↓
+Volume Mounted Inside Container
+```
+
+---
+
+# Conclusion
+
+Dynamic Provisioning eliminates the need for manually creating Persistent Volumes.
+
+Using the AWS EBS CSI Driver:
+
+- Storage is created automatically.
+- EBS volumes are provisioned on demand.
+- PVs are generated dynamically.
+- PVCs are automatically bound.
+- Pods can immediately consume persistent storage.
+- Storage remains available even if Pods are deleted or recreated.
+
+---
+
+

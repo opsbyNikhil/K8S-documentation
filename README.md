@@ -994,6 +994,281 @@
 - [Step 12: Verify Volume Inside Pod](#step-12-verify-volume-inside-pod)
 - [Complete Dynamic Provisioning Flow](#complete-dynamic-provisioning-flow)
 - [Conclusion](#conclusion-1)
+- [RBAC (Role-Based Access Control)](#rbac-role-based-access-control)
+  - [Purpose of RBAC](#purpose-of-rbac)
+- [1. Authentication (Who are you?)](#1-authentication-who-are-you)
+  - [Definition](#definition-26)
+  - [Purpose](#purpose-8)
+  - [Example](#example-19)
+  - [Authentication Methods](#authentication-methods)
+    - [Example](#example-20)
+- [2. Authorization (What can you do?)](#2-authorization-what-can-you-do)
+  - [Definition](#definition-27)
+  - [Purpose](#purpose-9)
+  - [Example](#example-21)
+    - [Example Scenario](#example-scenario)
+- [What is RBAC?](#what-is-rbac)
+- [What is Authentication?](#what-is-authentication)
+- [What is Authorization?](#what-is-authorization)
+- [RBAC Components in Kubernetes](#rbac-components-in-kubernetes)
+- [1. Role](#1-role)
+  - [Definition](#definition-28)
+  - [Purpose](#purpose-10)
+    - [Example](#example-22)
+    - [Key Point](#key-point-1)
+- [2. RoleBinding](#2-rolebinding)
+  - [Definition](#definition-29)
+  - [Purpose](#purpose-11)
+    - [Example](#example-23)
+    - [Key Point](#key-point-2)
+    - [Formula](#formula)
+  - [Namespace Scope](#namespace-scope)
+    - [Example](#example-24)
+    - [Result](#result)
+- [3. ClusterRole](#3-clusterrole)
+  - [Definition](#definition-30)
+  - [Purpose](#purpose-12)
+    - [Example](#example-25)
+    - [Key Point](#key-point-3)
+- [4. ClusterRoleBinding](#4-clusterrolebinding)
+  - [Definition](#definition-31)
+  - [Purpose](#purpose-13)
+    - [Example](#example-26)
+    - [Formula](#formula-1)
+  - [Cluster Scope](#cluster-scope)
+    - [Example](#example-27)
+    - [Access](#access)
+- [Summary](#summary-19)
+  - [Quick Definitions](#quick-definitions)
+    - [Role](#role)
+    - [RoleBinding](#rolebinding)
+    - [ClusterRole](#clusterrole)
+    - [ClusterRoleBinding](#clusterrolebinding)
+- [Kubernetes RBAC Implementation on AWS EKS](#kubernetes-rbac-implementation-on-aws-eks)
+- [Prerequisites](#prerequisites-3)
+- [Step 1: Create an EC2 Instance](#step-1-create-an-ec2-instance)
+- [Step 2: Install AWS CLI](#step-2-install-aws-cli-4)
+- [Step 3: Install kubectl](#step-3-install-kubectl-1)
+- [Step 4: Install eksctl and Create EKS Cluster](#step-4-install-eksctl-and-create-eks-cluster-1)
+- [Step 5: Create an IAM User](#step-5-create-an-iam-user)
+- [Step 6: Create an EKS Access Entry](#step-6-create-an-eks-access-entry)
+- [Step 7: Verify Access Entry](#step-7-verify-access-entry)
+- [Step 8: Associate Cluster Admin Policy](#step-8-associate-cluster-admin-policy)
+- [Step 9: Verify Access Policy](#step-9-verify-access-policy)
+- [Step 10: Create RBAC Resources](#step-10-create-rbac-resources)
+  - [Create Namespace](#create-namespace-3)
+  - [pod.yaml](#podyaml-4)
+  - [svc.yaml](#svcyaml-1)
+  - [role.yaml](#roleyaml)
+  - [role-binding.yaml](#role-bindingyaml)
+  - [Apply the Resources](#apply-the-resources)
+- [Step 11: Remove Cluster Admin Access](#step-11-remove-cluster-admin-access)
+- [Step 12: Assign View-Only Access](#step-12-assign-view-only-access)
+- [Testing RBAC](#testing-rbac)
+  - [Allowed](#allowed)
+  - [Not Allowed](#not-allowed)
+- [Namespace Deletion](#namespace-deletion)
+- [RBAC Flow](#rbac-flow)
+- [DaemonSet in Kubernetes](#daemonset-in-kubernetes)
+  - [Definition](#definition-32)
+- [Purpose of DaemonSet](#purpose-of-daemonset)
+- [How DaemonSet Works](#how-daemonset-works)
+- [Common Use Cases](#common-use-cases-2)
+  - [1. Node Monitoring](#1-node-monitoring)
+    - [Monitoring Metrics](#monitoring-metrics)
+    - [Examples](#examples-2)
+  - [2. Log Collection](#2-log-collection)
+    - [Functions](#functions)
+    - [Examples](#examples-3)
+  - [3. Node Configuration and Security](#3-node-configuration-and-security)
+    - [Functions](#functions-1)
+    - [Examples](#examples-4)
+- [DaemonSet Manifest](#daemonset-manifest)
+  - [daemonset.yaml](#daemonsetyaml)
+- [Deploy DaemonSet](#deploy-daemonset)
+- [Example](#example-28)
+- [DaemonSet vs StatefulSet](#daemonset-vs-statefulset)
+- [StatefulSet Overview](#statefulset-overview)
+    - [StatefulSet Flow](#statefulset-flow)
+- [DaemonSet Overview](#daemonset-overview)
+    - [DaemonSet Flow](#daemonset-flow)
+- [Real-Time Example](#real-time-example-12)
+- [Why Do We Use DaemonSet?](#why-do-we-use-daemonset)
+- [Summary](#summary-20)
+    - [DaemonSet](#daemonset)
+    - [StatefulSet](#statefulset-1)
+    - [Quick Comparison](#quick-comparison)
+- [Network Policy in Kubernetes](#network-policy-in-kubernetes)
+  - [Definition](#definition-33)
+- [Why Do We Need Network Policies?](#why-do-we-need-network-policies)
+    - [AWS Security Group](#aws-security-group)
+  - [Kubernetes Default Behavior](#kubernetes-default-behavior)
+- [What Can Network Policies Control?](#what-can-network-policies-control)
+  - [1. Pod-to-Pod Communication](#1-pod-to-pod-communication)
+  - [2. Namespace-to-Namespace Communication](#2-namespace-to-namespace-communication)
+  - [3. Cross-Node Pod Communication](#3-cross-node-pod-communication)
+  - [4. IP Address Communication](#4-ip-address-communication)
+- [Types of Network Policies](#types-of-network-policies)
+  - [1. Ingress Policy](#1-ingress-policy)
+    - [Example](#example-29)
+  - [2. Egress Policy](#2-egress-policy)
+    - [Example](#example-30)
+- [Network Policy Architecture](#network-policy-architecture)
+- [Example Implementation](#example-implementation)
+- [Pod Manifest](#pod-manifest)
+  - [pod-1.yaml](#pod-1yaml)
+  - [pod-2.yaml](#pod-2yaml)
+- [Network Policy Manifest](#network-policy-manifest)
+  - [network-policy.yaml](#network-policyyaml)
+- [Deploy Resources](#deploy-resources-2)
+- [Understanding the Policy](#understanding-the-policy)
+- [Communication Result](#communication-result)
+- [Explanation](#explanation-10)
+    - [my-pod-1 → my-pod-1](#my-pod-1--my-pod-1)
+    - [my-pod-1 → my-pod-2](#my-pod-1--my-pod-2)
+    - [my-pod-2 → my-pod-1](#my-pod-2--my-pod-1)
+    - [my-pod-2 → my-pod-2](#my-pod-2--my-pod-2)
+- [Real-Time Example](#real-time-example-13)
+- [Security Benefits](#security-benefits)
+- [Network Policy vs Security Group](#network-policy-vs-security-group)
+- [Summary](#summary-21)
+    - [Quick Overview](#quick-overview)
+- [Kubernetes Job](#kubernetes-job)
+  - [Definition](#definition-34)
+- [Why Do We Need Jobs?](#why-do-we-need-jobs)
+- [Common Use Cases](#common-use-cases-3)
+  - [1. Database Backup](#1-database-backup)
+  - [2. Data Migration](#2-data-migration)
+  - [3. Batch Processing](#3-batch-processing)
+  - [4. OS Updates](#4-os-updates)
+  - [5. Report Generation](#5-report-generation)
+  - [6. One-Time Scripts](#6-one-time-scripts)
+- [How a Job Works](#how-a-job-works)
+- [Job vs Deployment](#job-vs-deployment)
+- [Real-Time Example](#real-time-example-14)
+  - [Database Backup](#database-backup)
+    - [Workflow](#workflow)
+- [Job Lifecycle](#job-lifecycle)
+- [Important Job Parameters](#important-job-parameters)
+  - [restartPolicy](#restartpolicy)
+    - [Available Options](#available-options)
+  - [backoffLimit](#backofflimit)
+- [Example 1: Basic Backup Job](#example-1-basic-backup-job)
+  - [job.yaml](#jobyaml)
+- [Understanding the Configuration](#understanding-the-configuration)
+    - [Job Name](#job-name)
+    - [Retry Limit](#retry-limit)
+    - [Restart Policy](#restart-policy)
+- [Example 2: Backup Simulation Job](#example-2-backup-simulation-job)
+  - [job-backup.yaml](#job-backupyaml)
+- [What Happens Here?](#what-happens-here)
+- [Deploy the Job](#deploy-the-job)
+- [View Job Pods](#view-job-pods)
+- [Check Job Logs](#check-job-logs)
+- [Describe Job](#describe-job)
+- [Delete Job](#delete-job)
+- [Job Failure Scenario](#job-failure-scenario)
+- [Deployment vs Job Example](#deployment-vs-job-example)
+  - [Deployment](#deployment-1)
+  - [Job](#job)
+- [Summary](#summary-22)
+  - [Kubernetes Job](#kubernetes-job-1)
+    - [Common Uses](#common-uses)
+    - [Quick Overview](#quick-overview-1)
+- [Kubernetes CronJob](#kubernetes-cronjob)
+  - [Definition](#definition-35)
+- [Why Do We Need CronJobs?](#why-do-we-need-cronjobs)
+- [Common Use Cases](#common-use-cases-4)
+  - [1. Daily Database Backup](#1-daily-database-backup)
+  - [2. Log Cleanup](#2-log-cleanup)
+  - [3. Report Generation](#3-report-generation)
+  - [4. Data Synchronization](#4-data-synchronization)
+  - [5. Health Checks](#5-health-checks)
+  - [6. Maintenance Tasks](#6-maintenance-tasks)
+- [How a CronJob Works](#how-a-cronjob-works)
+- [Example Workflow](#example-workflow)
+  - [Daily Backup](#daily-backup)
+- [CronJob vs Job](#cronjob-vs-job)
+- [Relationship Between CronJob, Job, and Pod](#relationship-between-cronjob-job-and-pod)
+- [Understanding Cron Schedule Format](#understanding-cron-schedule-format)
+- [Common Schedule Examples](#common-schedule-examples)
+- [CronJob Manifest](#cronjob-manifest)
+  - [cronjob.yaml](#cronjobyaml)
+- [Understanding the Configuration](#understanding-the-configuration-1)
+  - [CronJob Name](#cronjob-name)
+  - [Schedule](#schedule)
+  - [Job Template](#job-template)
+  - [Container](#container)
+  - [Restart Policy](#restart-policy-1)
+- [Deploy CronJob](#deploy-cronjob)
+- [View Created Jobs](#view-created-jobs)
+- [View Pods](#view-pods-1)
+- [Check CronJob Details](#check-cronjob-details)
+- [View Logs](#view-logs)
+- [Delete CronJob](#delete-cronjob)
+- [Real-Time Example](#real-time-example-15)
+- [Job vs CronJob Example](#job-vs-cronjob-example)
+  - [Job](#job-1)
+  - [CronJob](#cronjob)
+- [Summary](#summary-23)
+  - [Kubernetes CronJob](#kubernetes-cronjob-1)
+    - [Common Use Cases](#common-use-cases-5)
+    - [Quick Overview](#quick-overview-2)
+- [Kubernetes Cordon and Uncordon](#kubernetes-cordon-and-uncordon)
+  - [What is Cordon?](#what-is-cordon)
+- [Why Do We Use Cordon?](#why-do-we-use-cordon)
+- [Cordon Command](#cordon-command)
+- [How Cordon Works](#how-cordon-works)
+- [Cordon Workflow](#cordon-workflow)
+- [Verify Cordoned Node](#verify-cordoned-node)
+- [Understanding the Status](#understanding-the-status)
+- [Real-Time Example](#real-time-example-16)
+- [Interview Definition](#interview-definition-8)
+- [What is Uncordon?](#what-is-uncordon)
+- [Uncordon Command](#uncordon-command)
+- [How Uncordon Works](#how-uncordon-works)
+- [Uncordon Workflow](#uncordon-workflow)
+- [Verify Uncordoned Node](#verify-uncordoned-node)
+- [Maintenance Workflow Example](#maintenance-workflow-example)
+  - [Step 1: Cordon the Node](#step-1-cordon-the-node)
+  - [Step 2: Perform Maintenance](#step-2-perform-maintenance)
+  - [Step 3: Verify Node Health](#step-3-verify-node-health)
+  - [Step 4: Uncordon the Node](#step-4-uncordon-the-node)
+- [Cordon vs Uncordon](#cordon-vs-uncordon)
+- [Example Scenario](#example-scenario-1)
+- [Cordon vs Drain](#cordon-vs-drain)
+- [Quick Summary](#quick-summary)
+  - [Cordon](#cordon)
+  - [Uncordon](#uncordon)
+- [Interview One-Liner](#interview-one-liner)
+- [Kubernetes Drain](#kubernetes-drain)
+  - [What is Drain?](#what-is-drain)
+- [Why Do We Use Drain?](#why-do-we-use-drain)
+- [Real-Time Example](#real-time-example-17)
+- [How Drain Works](#how-drain-works)
+- [Drain Command](#drain-command)
+- [Why Use --ignore-daemonsets?](#why-use---ignore-daemonsets)
+- [Complete Maintenance Workflow](#complete-maintenance-workflow)
+  - [Step 1: Prevent New Pods](#step-1-prevent-new-pods)
+  - [Step 2: Evict Existing Pods](#step-2-evict-existing-pods)
+  - [Step 3: Perform Maintenance](#step-3-perform-maintenance)
+  - [Step 4: Enable Scheduling Again](#step-4-enable-scheduling-again)
+- [Drain Workflow](#drain-workflow)
+- [Verify Node Status](#verify-node-status)
+- [Example Cluster Scenario](#example-cluster-scenario)
+- [Cordon vs Drain](#cordon-vs-drain-1)
+- [Drain vs Uncordon](#drain-vs-uncordon)
+- [Important Notes](#important-notes)
+    - [Drain Does Not Delete Applications](#drain-does-not-delete-applications)
+    - [Drain Requires Available Nodes](#drain-requires-available-nodes)
+    - [DaemonSet Pods Are Not Evicted](#daemonset-pods-are-not-evicted)
+- [Interview Definition](#interview-definition-9)
+- [Interview One-Liner](#interview-one-liner-1)
+- [Quick Summary](#quick-summary-1)
+  - [Cordon](#cordon-1)
+  - [Drain](#drain)
+  - [Uncordon](#uncordon-1)
+- [Complete Node Maintenance Lifecycle](#complete-node-maintenance-lifecycle)
 
 ---
 
@@ -11691,4 +11966,3672 @@ Using the AWS EBS CSI Driver:
 
 ---
 
+# RBAC (Role-Based Access Control)
 
+RBAC (Role-Based Access Control) is a Kubernetes security mechanism used to control **who can perform what actions on which resources**.
+
+## Purpose of RBAC
+
+- Restrict access to cluster resources.
+- Give users only the permissions they need.
+- Improve cluster security.
+
+---
+
+# 1. Authentication (Who are you?)
+
+## Definition
+
+Authentication is the process of verifying the identity of a user, group, or service account.
+
+## Purpose
+
+To check whether the user trying to access the cluster is genuine.
+
+## Example
+
+When user **nikhil** tries to access an EKS cluster:
+
+```bash
+kubectl get pods
+```
+
+Before allowing access, Kubernetes checks:
+
+- Is this user valid?
+- Did the user provide correct credentials?
+- Is the IAM user authenticated?
+
+If yes, authentication succeeds.
+
+---
+
+## Authentication Methods
+
+- IAM User (AWS EKS)
+- IAM Role
+- Client Certificates
+- OIDC Providers
+- Service Accounts
+
+### Example
+
+```text
+Username: nikhil
+Password/Token: ********
+```
+
+Kubernetes verifies the credentials.
+
+If valid:
+
+```text
+Authentication Successful
+```
+
+If invalid:
+
+```text
+Authentication Failed
+```
+
+---
+
+# 2. Authorization (What can you do?)
+
+## Definition
+
+Authorization determines what actions an authenticated user is allowed to perform.
+
+## Purpose
+
+To control access to Kubernetes resources.
+
+## Example
+
+After user **nikhil** logs in successfully, Kubernetes checks whether he can:
+
+- Create Pods
+- Delete Pods
+- Update Deployments
+- View Secrets
+- Create Namespaces
+
+Authorization decides this.
+
+### Example Scenario
+
+```text
+User: nikhil
+
+Authentication:
+✓ User verified
+
+Authorization:
+Can Create Pods          ✓
+Can Delete Pods          ✗
+Can View Secrets         ✗
+Can Update Deployments   ✓
+```
+
+---
+
+# What is RBAC?
+
+RBAC (Role-Based Access Control) is a Kubernetes security mechanism that controls access to cluster resources by assigning permissions to users, groups, or service accounts based on roles.
+
+---
+
+# What is Authentication?
+
+Authentication is the process of verifying the identity of a user, group, or service account.
+
+In AWS EKS, authentication is handled by AWS IAM, which validates whether the user is genuine before allowing access to the cluster.
+
+---
+
+# What is Authorization?
+
+Authorization is the process of determining what actions an authenticated user can perform on Kubernetes resources.
+
+Kubernetes uses RBAC components such as:
+
+- Role
+- RoleBinding
+- ClusterRole
+- ClusterRoleBinding
+
+to grant permissions like:
+
+- Create resources
+- Delete resources
+- Update resources
+- View resources
+
+---
+
+# RBAC Components in Kubernetes
+
+RBAC consists of four main components:
+
+1. Role
+2. RoleBinding
+3. ClusterRole
+4. ClusterRoleBinding
+
+---
+
+# 1. Role
+
+## Definition
+
+A Role contains a set of permissions that define what actions can be performed on Kubernetes resources within a specific namespace.
+
+## Purpose
+
+To define permissions such as:
+
+- Create Pods
+- Delete Pods
+- Update Deployments
+- View Services
+- Read ConfigMaps
+
+### Example
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-manager
+  namespace: dev
+
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "create", "delete"]
+```
+
+### Key Point
+
+**Role = Namespace-level Permissions**
+
+---
+
+# 2. RoleBinding
+
+## Definition
+
+A RoleBinding is used to attach a Role to a User, Group, or Service Account.
+
+## Purpose
+
+To grant the permissions defined in a Role to a specific identity.
+
+### Example
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: pod-manager-binding
+  namespace: dev
+
+subjects:
+- kind: User
+  name: nikhil
+  apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: Role
+  name: pod-manager
+  apiGroup: rbac.authorization.k8s.io
+```
+
+### Key Point
+
+```text
+RoleBinding = Connects Role with User/Group/Service Account
+```
+
+### Formula
+
+```text
+Role + User/Group/ServiceAccount = RoleBinding
+```
+
+---
+
+## Namespace Scope
+
+Role and RoleBinding work only within a specific namespace.
+
+### Example
+
+```text
+Namespace: dev
+
+Role:
+- Create Pods
+- Delete Pods
+
+User:
+- nikhil
+```
+
+### Result
+
+```text
+nikhil can create and delete pods only in the dev namespace.
+```
+
+He cannot access:
+
+- test namespace
+- prod namespace
+
+unless separate permissions are granted.
+
+---
+
+# 3. ClusterRole
+
+## Definition
+
+A ClusterRole contains permissions that apply across the entire cluster.
+
+## Purpose
+
+To provide access to:
+
+- All namespaces
+- Nodes
+- Persistent Volumes
+- Cluster-wide resources
+
+### Example
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-admin-role
+
+rules:
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["*"]
+```
+
+### Key Point
+
+```text
+ClusterRole = Cluster-wide Permissions
+```
+
+---
+
+# 4. ClusterRoleBinding
+
+## Definition
+
+A ClusterRoleBinding assigns a ClusterRole to a User, Group, or Service Account.
+
+## Purpose
+
+To provide cluster-wide access.
+
+### Example
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-binding
+
+subjects:
+- kind: User
+  name: nikhil
+  apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin-role
+  apiGroup: rbac.authorization.k8s.io
+```
+
+### Formula
+
+```text
+ClusterRole + User/Group/ServiceAccount = ClusterRoleBinding
+```
+
+---
+
+## Cluster Scope
+
+ClusterRole and ClusterRoleBinding can provide access to:
+
+- All Namespaces
+- All Pods
+- All Nodes
+- All Cluster Resources
+
+### Example
+
+```text
+User: nikhil
+
+Permissions:
+- Create Pods
+- Delete Pods
+- View Nodes
+- Manage Namespaces
+```
+
+### Access
+
+```text
+dev namespace      ✓
+test namespace     ✓
+prod namespace     ✓
+all nodes          ✓
+```
+
+---
+
+# Summary
+
+| Component | Scope | Purpose |
+|------------|---------|---------|
+| Role | Namespace | Defines permissions within a namespace |
+| RoleBinding | Namespace | Assigns a Role to a User, Group, or Service Account |
+| ClusterRole | Cluster | Defines permissions across the entire cluster |
+| ClusterRoleBinding | Cluster | Assigns a ClusterRole to a User, Group, or Service Account |
+
+---
+
+## Quick Definitions
+
+### Role
+Used to define permissions on resources within a specific namespace.
+
+### RoleBinding
+Used to assign a Role to a User, Group, or Service Account within a namespace.
+
+### ClusterRole
+Used to define permissions across the entire Kubernetes cluster, including all namespaces and cluster-level resources.
+
+### ClusterRoleBinding
+Used to assign a ClusterRole to a User, Group, or Service Account, providing cluster-wide access.
+
+---
+
+# Kubernetes RBAC Implementation on AWS EKS
+
+This guide demonstrates how to implement RBAC (Role-Based Access Control) in an AWS EKS cluster.
+
+---
+
+# Prerequisites
+
+* AWS Account
+* EC2 Instance
+* AWS CLI
+* kubectl
+* eksctl
+
+---
+
+# Step 1: Create an EC2 Instance
+
+Create an EC2 instance and connect to it:
+
+```bash
+ssh <username>@<public-ip>
+```
+
+Example:
+
+```bash
+ssh ubuntu@<public-ip>
+```
+
+---
+
+# Step 2: Install AWS CLI
+
+Install AWS CLI and configure credentials:
+
+```bash
+aws configure
+```
+
+Provide:
+
+```text
+AWS Access Key ID
+AWS Secret Access Key
+Default Region
+Output Format
+```
+
+---
+
+# Step 3: Install kubectl
+
+Install kubectl from the Kubernetes documentation.
+
+Verify installation:
+
+```bash
+kubectl version --client
+```
+
+---
+
+# Step 4: Install eksctl and Create EKS Cluster
+
+Create an EKS cluster:
+
+```bash
+eksctl create cluster \
+--name <cluster-name> \
+--region <region-name> \
+--nodes <number-of-nodes> \
+--node-type <instance-type>
+```
+
+Example:
+
+```bash
+eksctl create cluster \
+--name demo-cluster \
+--region ap-south-1 \
+--nodes 2 \
+--node-type t3.medium
+```
+
+Verify:
+
+```bash
+kubectl get nodes
+```
+
+---
+
+# Step 5: Create an IAM User
+
+Navigate to:
+
+```text
+AWS Console → IAM → Users → Create User
+```
+
+* Enter Username
+* Enable AWS Management Console access
+* Set a custom password
+* Attach required policies
+
+Example policy:
+
+```text
+AmazonEKSClusterPolicy
+```
+
+---
+
+# Step 6: Create an EKS Access Entry
+
+```bash
+aws eks create-access-entry \
+--cluster-name <cluster-name> \
+--principal-arn <iam-user-arn>
+```
+
+Example:
+
+```bash
+aws eks create-access-entry \
+--cluster-name demo-cluster \
+--principal-arn arn:aws:iam::<account-id>:user/<user-name>
+```
+
+---
+
+# Step 7: Verify Access Entry
+
+```bash
+aws eks list-access-entries \
+--cluster-name <cluster-name>
+```
+
+---
+
+# Step 8: Associate Cluster Admin Policy
+
+```bash
+aws eks associate-access-policy \
+--cluster-name <cluster-name> \
+--principal-arn <iam-user-arn> \
+--policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy \
+--access-scope type=cluster
+```
+
+---
+
+# Step 9: Verify Access Policy
+
+```bash
+aws eks describe-access-entry \
+--cluster-name <cluster-name> \
+--principal-arn <iam-user-arn>
+```
+
+---
+
+# Step 10: Create RBAC Resources
+
+## Create Namespace
+
+```bash
+kubectl create namespace <namespace>
+```
+
+Example:
+
+```bash
+kubectl create namespace dev
+```
+
+Set the namespace as default:
+
+```bash
+kubectl config set-context --current --namespace=<namespace>
+```
+
+---
+
+## pod.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: <pod-name>
+  namespace: <namespace>
+  labels:
+    app: <application-label>
+
+spec:
+  containers:
+  - name: <container-name>
+    image: <image-name>
+    ports:
+    - containerPort: 80
+```
+
+---
+
+## svc.yaml
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: <service-name>
+  namespace: <namespace>
+
+spec:
+  selector:
+    app: <application-label>
+
+  type: NodePort
+
+  ports:
+  - port: 80
+    targetPort: 80
+    nodePort: <node-port>
+    protocol: TCP
+```
+
+---
+
+## role.yaml
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+
+metadata:
+  name: <role-name>
+  namespace: <namespace>
+
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs:
+  - get
+```
+
+---
+
+## role-binding.yaml
+
+```yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+
+metadata:
+  name: <rolebinding-name>
+  namespace: <namespace>
+
+subjects:
+- kind: User
+  name: <iam-user-arn>
+  apiGroup: rbac.authorization.k8s.io
+
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: <role-name>
+```
+
+---
+
+## Apply the Resources
+
+```bash
+kubectl apply -f .
+```
+
+Verify:
+
+```bash
+kubectl get all -n <namespace>
+```
+
+---
+
+# Step 11: Remove Cluster Admin Access
+
+```bash
+aws eks disassociate-access-policy \
+--cluster-name <cluster-name> \
+--principal-arn <iam-user-arn> \
+--policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy
+```
+
+---
+
+# Step 12: Assign View-Only Access
+
+```bash
+aws eks associate-access-policy \
+--cluster-name <cluster-name> \
+--principal-arn <iam-user-arn> \
+--policy-arn arn:aws:eks::aws:cluster-access-policy/AmazonEKSViewPolicy \
+--access-scope type=cluster
+```
+
+---
+
+# Testing RBAC
+
+## Allowed
+
+```bash
+kubectl get pods -n <namespace>
+```
+
+Because the Role contains:
+
+```yaml
+verbs:
+- get
+```
+
+---
+
+## Not Allowed
+
+```bash
+kubectl delete pod <pod-name> -n <namespace>
+```
+
+Expected Result:
+
+```text
+Error: Forbidden
+```
+
+Because DELETE permission was not granted.
+
+---
+
+# Namespace Deletion
+
+Attempting to delete the namespace:
+
+```bash
+kubectl delete namespace <namespace>
+```
+
+May fail if the user only has View access.
+
+To delete the namespace, first associate:
+
+```text
+AmazonEKSClusterAdminPolicy
+```
+
+Then run:
+
+```bash
+kubectl delete namespace <namespace>
+```
+
+---
+
+# RBAC Flow
+
+```text
+IAM User
+   │
+   ▼
+Authentication (AWS IAM)
+   │
+   ▼
+Authorization (RBAC)
+   │
+   ▼
+Role
+   │
+   ▼
+RoleBinding
+   │
+   ▼
+Permissions Granted
+```
+
+Example:
+
+```text
+Role:
+- get pods
+
+Allowed:
+✓ kubectl get pods
+
+Not Allowed:
+✗ kubectl delete pods
+✗ kubectl create pods
+✗ kubectl update pods
+```
+
+---
+
+# DaemonSet in Kubernetes
+
+## Definition
+
+A **DaemonSet** is a Kubernetes workload resource that ensures a copy of a Pod runs on every worker node (or selected worker nodes) in a cluster.
+
+---
+
+# Purpose of DaemonSet
+
+* Runs one Pod on every worker node.
+* Automatically creates a Pod when a new worker node joins the cluster.
+* Automatically removes the Pod when a worker node is removed from the cluster.
+* Ensures node-level services are available across all worker nodes.
+
+---
+
+# How DaemonSet Works
+
+Suppose a Kubernetes cluster contains **5 worker nodes**.
+
+```text
+Worker Node 1  → Pod 1
+Worker Node 2  → Pod 2
+Worker Node 3  → Pod 3
+Worker Node 4  → Pod 4
+Worker Node 5  → Pod 5
+```
+
+DaemonSet automatically creates **one Pod per worker node**.
+
+If a new worker node joins the cluster:
+
+```text
+Worker Node 6 → Pod 6
+```
+
+Kubernetes automatically schedules a new Pod on that node.
+
+If a worker node is removed, the corresponding Pod is also removed automatically.
+
+---
+
+# Common Use Cases
+
+## 1. Node Monitoring
+
+Used to monitor the health and performance of worker nodes.
+
+### Monitoring Metrics
+
+* CPU Utilization
+* Memory Utilization
+* Disk Usage
+* Network Usage
+
+### Examples
+
+* Prometheus Node Exporter
+* Datadog Agent
+* New Relic Infrastructure Agent
+
+---
+
+## 2. Log Collection
+
+Used to collect logs from all worker nodes and applications.
+
+### Functions
+
+* Collect node logs
+* Collect container logs
+* Forward logs to centralized logging systems
+
+### Examples
+
+* Fluentd
+* Fluent Bit
+* Logstash
+
+---
+
+## 3. Node Configuration and Security
+
+Used to configure and secure worker nodes.
+
+### Functions
+
+* Configure networking
+* Apply security policies
+* Run security agents
+* Install node-level tools
+
+### Examples
+
+* Calico
+* Falco
+* Security Monitoring Agents
+
+---
+
+# DaemonSet Manifest
+
+## daemonset.yaml
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+
+metadata:
+  name: daemonset
+
+spec:
+  minReadySeconds: 5
+
+  selector:
+    matchLabels:
+      app: dev
+
+  template:
+    metadata:
+      name: my-pod
+      labels:
+        app: dev
+
+    spec:
+      containers:
+      - name: my-cont
+        image: opsbynikhil/greenpage:GREENPAGE
+
+        ports:
+        - containerPort: 80
+          protocol: TCP
+```
+
+---
+
+# Deploy DaemonSet
+
+Create the DaemonSet:
+
+```bash
+kubectl apply -f daemonset.yaml
+```
+
+Verify:
+
+```bash
+kubectl get daemonset
+```
+
+or
+
+```bash
+kubectl get ds
+```
+
+Check Pods:
+
+```bash
+kubectl get pods -o wide
+```
+
+---
+
+# Example
+
+Suppose the cluster contains 3 worker nodes:
+
+```text
+Node-1
+Node-2
+Node-3
+```
+
+After deploying the DaemonSet:
+
+```text
+Node-1 → Pod-1
+Node-2 → Pod-2
+Node-3 → Pod-3
+```
+
+If a new worker node joins:
+
+```text
+Node-4 → Pod-4
+```
+
+DaemonSet automatically creates the Pod.
+
+---
+
+# DaemonSet vs StatefulSet
+
+| StatefulSet                          | DaemonSet                                      |
+| ------------------------------------ | ---------------------------------------------- |
+| Used for stateful applications.      | Used to run one Pod on every worker node.      |
+| Creates a separate PVC for each Pod. | Does not create PVCs automatically.            |
+| Maintains Pod identity and storage.  | Maintains node-level services.                 |
+| Used for databases.                  | Used for monitoring, logging, and node agents. |
+| Each Pod gets unique storage.        | Each node gets one Pod.                        |
+| Example: MySQL, MongoDB, PostgreSQL  | Example: Fluentd, Node Exporter, Datadog Agent |
+
+---
+
+# StatefulSet Overview
+
+A StatefulSet is used when applications require:
+
+* Persistent Storage
+* Stable Network Identity
+* Ordered Deployment
+* Ordered Scaling
+
+Examples:
+
+* MySQL
+* PostgreSQL
+* MongoDB
+* Cassandra
+
+### StatefulSet Flow
+
+```text
+Pod-0 → PVC-0
+Pod-1 → PVC-1
+Pod-2 → PVC-2
+```
+
+Each Pod receives its own Persistent Volume Claim (PVC).
+
+This helps maintain database data even if Pods restart.
+
+---
+
+# DaemonSet Overview
+
+A DaemonSet is used when the focus is on the worker nodes rather than application data.
+
+### DaemonSet Flow
+
+```text
+Worker Node-1 → Agent Pod
+Worker Node-2 → Agent Pod
+Worker Node-3 → Agent Pod
+```
+
+One Pod runs on every worker node.
+
+No PVCs are created automatically.
+
+---
+
+# Real-Time Example
+
+Consider a Kubernetes cluster with multiple worker nodes.
+
+You want to monitor:
+
+* CPU Utilization
+* Memory Utilization
+* Disk Usage
+* Network Usage
+
+Installing a monitoring tool manually on every node is difficult.
+
+Instead, deploy a DaemonSet.
+
+```text
+DaemonSet
+    ↓
+Creates one monitoring Pod
+on every worker node
+```
+
+Each Pod works as an agent and continuously collects node metrics.
+
+---
+
+# Why Do We Use DaemonSet?
+
+DaemonSet is commonly used when:
+
+* Every worker node needs an agent.
+* Node monitoring is required.
+* Log collection is required.
+* Security monitoring is required.
+* Network configuration is required.
+* Cluster-wide node management is required.
+
+---
+
+# Summary
+
+### DaemonSet
+
+* Creates one Pod on every worker node.
+* Automatically handles new and removed nodes.
+* Mainly used for monitoring, logging, networking, and security agents.
+* Focuses on node-level operations.
+
+### StatefulSet
+
+* Used for stateful applications.
+* Creates a unique Pod identity.
+* Creates separate storage (PVC) for each Pod.
+* Mainly used for databases and applications requiring persistent storage.
+
+### Quick Comparison
+
+```text
+StatefulSet
+    ↓
+Pod + PVC
+    ↓
+Database Applications
+
+DaemonSet
+    ↓
+One Pod per Worker Node
+    ↓
+Monitoring, Logging, Security Agents
+```
+
+---
+
+# Network Policy in Kubernetes
+
+## Definition
+
+A **Network Policy** is a Kubernetes resource used to control network traffic between Pods, Namespaces, and IP addresses within a cluster.
+
+It defines how groups of Pods are allowed to communicate with each other and with external network endpoints.
+
+---
+
+# Why Do We Need Network Policies?
+
+In AWS, access to EC2 instances is controlled using **Security Groups**.
+
+### AWS Security Group
+
+```text
+User
+   │
+   ▼
+Security Group
+   │
+   ├── Inbound Rules
+   └── Outbound Rules
+   │
+   ▼
+EC2 Instance
+```
+
+Security Groups control:
+
+* Who can access the EC2 instance
+* Which ports are open
+* Outbound traffic rules
+
+---
+
+## Kubernetes Default Behavior
+
+By default, Kubernetes allows:
+
+* Pod-to-Pod communication
+* Namespace-to-Namespace communication
+* Cross-node Pod communication
+
+```text
+Pod A ↔ Pod B
+Allowed by Default
+```
+
+This default behavior may not be secure for production environments.
+
+To restrict communication, Kubernetes uses **Network Policies**.
+
+---
+
+# What Can Network Policies Control?
+
+## 1. Pod-to-Pod Communication
+
+Control which Pods can communicate with other Pods.
+
+Example:
+
+```text
+Frontend Pod → Backend Pod
+Allowed
+
+Unknown Pod → Backend Pod
+Denied
+```
+
+---
+
+## 2. Namespace-to-Namespace Communication
+
+Control communication between different namespaces.
+
+Example:
+
+```text
+frontend namespace → backend namespace
+Allowed
+
+test namespace → backend namespace
+Denied
+```
+
+---
+
+## 3. Cross-Node Pod Communication
+
+Control communication between Pods running on different worker nodes.
+
+Example:
+
+```text
+Worker Node 1
+ └── Pod A
+
+Worker Node 2
+ └── Pod B
+
+Pod A ↔ Pod B
+Controlled by Network Policy
+```
+
+---
+
+## 4. IP Address Communication
+
+Allow or deny traffic from specific IP addresses or CIDR ranges.
+
+Example:
+
+```text
+192.168.1.10
+Allowed
+
+10.0.0.0/24
+Denied
+```
+
+---
+
+# Types of Network Policies
+
+## 1. Ingress Policy
+
+Ingress controls **incoming traffic** to a Pod.
+
+### Example
+
+Allow traffic only from frontend Pods to backend Pods.
+
+```text
+Frontend Pod → Backend Pod
+Allowed
+
+Any Other Pod → Backend Pod
+Denied
+```
+
+---
+
+## 2. Egress Policy
+
+Egress controls **outgoing traffic** from a Pod.
+
+### Example
+
+Allow a Pod to communicate only with a database server.
+
+```text
+Application Pod → Database
+Allowed
+
+Application Pod → Internet
+Denied
+```
+
+---
+
+# Network Policy Architecture
+
+```text
+                    Network Policy
+                           │
+        ┌──────────────────┴──────────────────┐
+        │                                     │
+        ▼                                     ▼
+   Ingress Rules                       Egress Rules
+(Incoming Traffic)                 (Outgoing Traffic)
+```
+
+---
+
+# Example Implementation
+
+In this example:
+
+* Pod 1 uses label `env=my-app-1`
+* Pod 2 uses label `env=my-app-2`
+* Both Pods have Network Policies applied
+* Only Ingress policies are defined
+* No ingress rules are specified
+
+Result:
+
+```text
+All incoming traffic is denied.
+```
+
+---
+
+# Pod Manifest
+
+## pod-1.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: my-pod-1
+  labels:
+    env: my-app-1
+
+spec:
+  containers:
+  - name: my-pod
+    image: opsbynikhil/redpage:REDPAGE
+
+    ports:
+    - containerPort: 80
+      protocol: TCP
+```
+
+---
+
+## pod-2.yaml
+
+```yaml
+apiVersion: v1
+kind: Pod
+
+metadata:
+  name: my-pod-2
+  labels:
+    env: my-app-2
+
+spec:
+  containers:
+  - name: my-pod
+    image: opsbynikhil/redpage:REDPAGE
+
+    ports:
+    - containerPort: 80
+      protocol: TCP
+```
+
+---
+
+# Network Policy Manifest
+
+## network-policy.yaml
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+
+metadata:
+  name: deny-network-2
+
+spec:
+  podSelector:
+    matchLabels:
+      env: my-app-1
+
+  policyTypes:
+  - Ingress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+
+metadata:
+  name: deny-network-1
+
+spec:
+  podSelector:
+    matchLabels:
+      env: my-app-2
+
+  policyTypes:
+  - Ingress
+```
+
+---
+
+# Deploy Resources
+
+Create the Pods:
+
+```bash
+kubectl apply -f pod-1.yaml
+kubectl apply -f pod-2.yaml
+```
+
+Apply the Network Policy:
+
+```bash
+kubectl apply -f network-policy.yaml
+```
+
+Verify:
+
+```bash
+kubectl get pods
+kubectl get networkpolicy
+```
+
+---
+
+# Understanding the Policy
+
+The Network Policy contains:
+
+```yaml
+policyTypes:
+- Ingress
+```
+
+However, no ingress rules are defined.
+
+Therefore:
+
+```text
+All incoming traffic is denied.
+```
+
+This creates a "deny all ingress" policy for the selected Pods.
+
+---
+
+# Communication Result
+
+| Source Pod | Destination Pod | Result    |
+| ---------- | --------------- | --------- |
+| my-pod-1   | my-pod-1        | ✅ Allowed |
+| my-pod-1   | my-pod-2        | ❌ Denied  |
+| my-pod-2   | my-pod-1        | ❌ Denied  |
+| my-pod-2   | my-pod-2        | ✅ Allowed |
+
+---
+
+# Explanation
+
+### my-pod-1 → my-pod-1
+
+```text
+Allowed
+```
+
+A Pod can communicate with itself.
+
+---
+
+### my-pod-1 → my-pod-2
+
+```text
+Denied
+```
+
+Incoming traffic to my-pod-2 is blocked by its Network Policy.
+
+---
+
+### my-pod-2 → my-pod-1
+
+```text
+Denied
+```
+
+Incoming traffic to my-pod-1 is blocked by its Network Policy.
+
+---
+
+### my-pod-2 → my-pod-2
+
+```text
+Allowed
+```
+
+A Pod can communicate with itself.
+
+---
+
+# Real-Time Example
+
+Suppose we have:
+
+```text
+Frontend Pod
+Backend Pod
+Database Pod
+```
+
+Requirements:
+
+```text
+Frontend → Backend      Allowed
+Backend → Database      Allowed
+Frontend → Database     Denied
+Unknown Pods → Database Denied
+```
+
+Using Network Policies, we can enforce these communication rules.
+
+---
+
+# Security Benefits
+
+Network Policies help:
+
+* Restrict unauthorized Pod communication
+* Protect sensitive applications
+* Implement Zero Trust networking
+* Reduce attack surface
+* Improve cluster security
+
+---
+
+# Network Policy vs Security Group
+
+| AWS Security Group       | Kubernetes Network Policy  |
+| ------------------------ | -------------------------- |
+| Controls EC2 traffic     | Controls Pod traffic       |
+| Uses Inbound Rules       | Uses Ingress Rules         |
+| Uses Outbound Rules      | Uses Egress Rules          |
+| Works at VM level        | Works at Pod level         |
+| Controls instance access | Controls Pod communication |
+
+---
+
+# Summary
+
+* Network Policy controls communication between Pods, Namespaces, and IP addresses.
+* Similar to AWS Security Groups but operates at the Pod level.
+* Supports Ingress and Egress traffic rules.
+* Used to secure Pod-to-Pod communication.
+* Used to secure Namespace-to-Namespace communication.
+* Used to control traffic across worker nodes.
+* Used to allow or block specific IP addresses and CIDR ranges.
+
+### Quick Overview
+
+```text
+AWS Security Group
+        ↓
+Controls EC2 Traffic
+
+Kubernetes Network Policy
+        ↓
+Controls Pod Traffic
+
+Ingress  → Incoming Traffic
+Egress   → Outgoing Traffic
+```
+
+---
+
+# Kubernetes Job
+
+## Definition
+
+A **Job** is a Kubernetes workload resource used to execute a one-time or finite task.
+
+A Job creates one or more Pods and ensures that they run successfully until the assigned task is completed.
+
+Once the task finishes successfully:
+
+* The Pod exits.
+* The Pod status becomes **Completed**.
+* The Job status becomes **Complete**.
+
+Unlike a Deployment, a Job does not keep Pods running continuously.
+
+---
+
+# Why Do We Need Jobs?
+
+Jobs are used when a task needs to run only once or for a limited duration.
+
+Examples:
+
+* Database Backups
+* Data Migration
+* Batch Processing
+* OS Updates
+* Report Generation
+* Maintenance Activities
+* One-Time Scripts
+
+---
+
+# Common Use Cases
+
+## 1. Database Backup
+
+```text
+Take database backup
+Store backup file
+Exit
+```
+
+---
+
+## 2. Data Migration
+
+```text
+Move data from one database
+to another database
+```
+
+---
+
+## 3. Batch Processing
+
+```text
+Process large datasets
+Generate output
+Exit
+```
+
+---
+
+## 4. OS Updates
+
+```text
+Run update script
+Install updates
+Exit
+```
+
+---
+
+## 5. Report Generation
+
+```text
+Generate daily report
+Send report
+Exit
+```
+
+---
+
+## 6. One-Time Scripts
+
+```text
+Run initialization script
+Perform task
+Exit
+```
+
+---
+
+# How a Job Works
+
+```text
+Job
+ │
+ ▼
+Creates Pod
+ │
+ ▼
+Executes Task
+(Backup / Migration / Update)
+ │
+ ▼
+Task Completes Successfully
+ │
+ ▼
+Pod Status = Completed
+ │
+ ▼
+Job Status = Complete
+```
+
+---
+
+# Job vs Deployment
+
+| Deployment                              | Job                                 |
+| --------------------------------------- | ----------------------------------- |
+| Keeps Pods running continuously         | Runs Pods until task completion     |
+| Used for applications                   | Used for batch jobs                 |
+| Restarts Pods to maintain desired state | Stops after successful completion   |
+| Suitable for web applications           | Suitable for backups and migrations |
+| Pod status remains Running              | Pod status becomes Completed        |
+
+---
+
+# Real-Time Example
+
+## Database Backup
+
+Suppose a database backup needs to be taken every time a script is triggered.
+
+### Workflow
+
+```text
+Database Backup Job
+        │
+        ▼
+     Pod Created
+        │
+        ▼
+   Backup Started
+        │
+        ▼
+ Backup Completed
+        │
+        ▼
+ Pod Status = Completed
+        │
+        ▼
+ Job Status = Complete
+```
+
+The Pod terminates after successfully completing the backup task.
+
+---
+
+# Job Lifecycle
+
+```text
+Job Created
+     │
+     ▼
+Pod Created
+     │
+     ▼
+Task Running
+     │
+     ▼
+Task Successful
+     │
+     ▼
+Pod Completed
+     │
+     ▼
+Job Complete
+```
+
+---
+
+# Important Job Parameters
+
+## restartPolicy
+
+Determines whether the Pod should restart when it fails.
+
+### Available Options
+
+```yaml
+restartPolicy: Never
+```
+
+* Pod never restarts.
+
+```yaml
+restartPolicy: OnFailure
+```
+
+* Pod restarts only if the task fails.
+
+---
+
+## backoffLimit
+
+Defines how many times Kubernetes retries a failed Job.
+
+Example:
+
+```yaml
+backoffLimit: 5
+```
+
+Meaning:
+
+```text
+If the Job fails,
+Kubernetes retries up to 5 times.
+```
+
+---
+
+# Example 1: Basic Backup Job
+
+## job.yaml
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+
+metadata:
+  name: my-backup
+
+spec:
+  backoffLimit: 5
+
+  template:
+    metadata:
+      name: my-pod-backup
+
+    spec:
+      containers:
+      - name: my-backup-container
+        image: busybox
+
+      restartPolicy: Never
+```
+
+---
+
+# Understanding the Configuration
+
+### Job Name
+
+```yaml
+metadata:
+  name: my-backup
+```
+
+Creates a Job named:
+
+```text
+my-backup
+```
+
+---
+
+### Retry Limit
+
+```yaml
+backoffLimit: 5
+```
+
+If the Job fails:
+
+```text
+Retry 1
+Retry 2
+Retry 3
+Retry 4
+Retry 5
+```
+
+After 5 failures:
+
+```text
+Job Failed
+```
+
+---
+
+### Restart Policy
+
+```yaml
+restartPolicy: Never
+```
+
+If the Pod exits:
+
+```text
+No restart
+```
+
+---
+
+# Example 2: Backup Simulation Job
+
+## job-backup.yaml
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+
+metadata:
+  name: my-job
+
+spec:
+  template:
+    spec:
+      containers:
+      - name: my-container
+        image: opsbynikhil/redpage:REDPAGE
+
+        command:
+        - sh
+        - -c
+        - |
+          echo "Running Backup"
+          sleep 10
+          echo "Backup Completed"
+
+      restartPolicy: Never
+```
+
+---
+
+# What Happens Here?
+
+The container executes:
+
+```bash
+echo "Running Backup"
+sleep 10
+echo "Backup Completed"
+```
+
+Execution Flow:
+
+```text
+Pod Created
+     │
+     ▼
+Running Backup
+     │
+     ▼
+Wait 10 Seconds
+     │
+     ▼
+Backup Completed
+     │
+     ▼
+Container Exits
+     │
+     ▼
+Pod Status = Completed
+     │
+     ▼
+Job Status = Complete
+```
+
+---
+
+# Deploy the Job
+
+Create the Job:
+
+```bash
+kubectl apply -f job.yaml
+```
+
+Verify:
+
+```bash
+kubectl get jobs
+```
+
+Example Output:
+
+```text
+NAME       COMPLETIONS   DURATION   AGE
+my-job     1/1           12s        20s
+```
+
+---
+
+# View Job Pods
+
+```bash
+kubectl get pods
+```
+
+Example Output:
+
+```text
+NAME               READY   STATUS      RESTARTS   AGE
+my-job-xxxxx       0/1     Completed   0          15s
+```
+
+---
+
+# Check Job Logs
+
+```bash
+kubectl logs <pod-name>
+```
+
+Example Output:
+
+```text
+Running Backup
+Backup Completed
+```
+
+---
+
+# Describe Job
+
+```bash
+kubectl describe job <job-name>
+```
+
+Example:
+
+```bash
+kubectl describe job my-job
+```
+
+This displays:
+
+* Job Status
+* Pod Details
+* Events
+* Completion Information
+
+---
+
+# Delete Job
+
+Delete a Job:
+
+```bash
+kubectl delete job <job-name>
+```
+
+Example:
+
+```bash
+kubectl delete job my-job
+```
+
+---
+
+# Job Failure Scenario
+
+Suppose a task fails:
+
+```text
+Pod Failed
+      │
+      ▼
+Kubernetes Checks
+backoffLimit
+      │
+      ▼
+Retries Job
+      │
+      ▼
+Task Succeeds
+      │
+      ▼
+Job Complete
+```
+
+If all retries fail:
+
+```text
+Job Status = Failed
+```
+
+---
+
+# Deployment vs Job Example
+
+## Deployment
+
+```text
+Web Application
+      │
+      ▼
+Pod Running
+      │
+      ▼
+Pod Crashes
+      │
+      ▼
+New Pod Created
+```
+
+Goal:
+
+```text
+Keep Application Running Forever
+```
+
+---
+
+## Job
+
+```text
+Backup Task
+      │
+      ▼
+Pod Created
+      │
+      ▼
+Backup Completed
+      │
+      ▼
+Pod Stopped
+```
+
+Goal:
+
+```text
+Run Once and Exit
+```
+
+---
+
+# Summary
+
+## Kubernetes Job
+
+* Executes one-time or batch-processing tasks.
+* Creates Pods to perform a specific task.
+* Ensures the task completes successfully.
+* Stops Pods after completion.
+* Supports retry mechanisms using `backoffLimit`.
+* Supports failure handling using `restartPolicy`.
+
+### Common Uses
+
+* Database Backups
+* Data Migration
+* Batch Processing
+* Report Generation
+* OS Updates
+* Maintenance Scripts
+
+### Quick Overview
+
+```text
+Job
+ │
+ ▼
+Create Pod
+ │
+ ▼
+Run Task
+ │
+ ▼
+Task Complete
+ │
+ ▼
+Pod Completed
+ │
+ ▼
+Job Complete
+```
+
+---
+
+# Kubernetes CronJob
+
+## Definition
+
+A **CronJob** is a Kubernetes workload resource used to run tasks automatically at a scheduled time or interval.
+
+A CronJob creates a **Job** based on a predefined schedule, and the Job creates a **Pod** to execute the task.
+
+After the task completes successfully:
+
+* The Pod status becomes **Completed**
+* The Job status becomes **Complete**
+* Kubernetes waits for the next scheduled execution
+
+CronJob works similarly to the Linux **cron scheduler**.
+
+---
+
+# Why Do We Need CronJobs?
+
+CronJobs are used when a task must run repeatedly at a specific time or interval without manual intervention.
+
+Examples:
+
+* Daily Database Backups
+* Log Cleanup
+* Report Generation
+* Scheduled Data Synchronization
+* Health Checks
+* Maintenance Tasks
+
+---
+
+# Common Use Cases
+
+## 1. Daily Database Backup
+
+```text
+Every Day at 2:00 AM
+        │
+        ▼
+Database Backup Starts
+        │
+        ▼
+Backup Completed
+```
+
+---
+
+## 2. Log Cleanup
+
+```text
+Every Midnight
+        │
+        ▼
+Delete Old Logs
+        │
+        ▼
+Cleanup Completed
+```
+
+---
+
+## 3. Report Generation
+
+```text
+Every Morning
+        │
+        ▼
+Generate Reports
+        │
+        ▼
+Send Reports
+```
+
+---
+
+## 4. Data Synchronization
+
+```text
+Every Hour
+        │
+        ▼
+Sync Data
+        │
+        ▼
+Task Completed
+```
+
+---
+
+## 5. Health Checks
+
+```text
+Every 10 Minutes
+        │
+        ▼
+Check Application Health
+        │
+        ▼
+Generate Status Report
+```
+
+---
+
+## 6. Maintenance Tasks
+
+```text
+Every Sunday
+        │
+        ▼
+Run Maintenance Scripts
+        │
+        ▼
+Task Completed
+```
+
+---
+
+# How a CronJob Works
+
+```text
+CronJob
+   │
+   ▼
+Schedule Defined
+   │
+   ▼
+Scheduled Time Reached
+   │
+   ▼
+Job Created
+   │
+   ▼
+Pod Created
+   │
+   ▼
+Task Executed
+   │
+   ▼
+Task Completed
+   │
+   ▼
+Pod Status = Completed
+   │
+   ▼
+Job Status = Complete
+```
+
+---
+
+# Example Workflow
+
+## Daily Backup
+
+CronJob Name:
+
+```text
+daily-backup
+```
+
+Schedule:
+
+```text
+Every Day at 2:00 AM
+```
+
+Execution Flow:
+
+```text
+CronJob
+   │
+   ▼
+2:00 AM Triggered
+   │
+   ▼
+Job Created
+   │
+   ▼
+Pod Created
+   │
+   ▼
+Database Backup Executed
+   │
+   ▼
+Backup Completed
+   │
+   ▼
+Pod Stopped
+   │
+   ▼
+Job Marked Complete
+```
+
+---
+
+# CronJob vs Job
+
+| Job                     | CronJob                  |
+| ----------------------- | ------------------------ |
+| Runs once               | Runs on a schedule       |
+| Manually triggered      | Automatically triggered  |
+| Used for one-time tasks | Used for recurring tasks |
+| Creates Pod once        | Creates Jobs repeatedly  |
+| Example: Data Migration | Example: Daily Backup    |
+
+---
+
+# Relationship Between CronJob, Job, and Pod
+
+```text
+CronJob
+   │
+   ▼
+Creates Job
+   │
+   ▼
+Job Creates Pod
+   │
+   ▼
+Pod Executes Task
+   │
+   ▼
+Task Completed
+```
+
+---
+
+# Understanding Cron Schedule Format
+
+CronJobs use the following format:
+
+```text
+* * * * *
+│ │ │ │ │
+│ │ │ │ └── Day of Week (0-7)
+│ │ │ └──── Month (1-12)
+│ │ └────── Day of Month (1-31)
+│ └──────── Hour (0-23)
+└────────── Minute (0-59)
+```
+
+---
+
+# Common Schedule Examples
+
+| Schedule      | Meaning                  |
+| ------------- | ------------------------ |
+| `* * * * *`   | Every minute             |
+| `*/5 * * * *` | Every 5 minutes          |
+| `0 * * * *`   | Every hour               |
+| `0 2 * * *`   | Every day at 2:00 AM     |
+| `0 0 * * 0`   | Every Sunday at midnight |
+| `0 9 * * 1`   | Every Monday at 9:00 AM  |
+
+---
+
+# CronJob Manifest
+
+## cronjob.yaml
+
+```yaml
+apiVersion: batch/v1
+kind: CronJob
+
+metadata:
+  name: my-backup
+
+spec:
+  schedule: "0 2 * * *"
+
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: mycronjob-backup
+            image: busybox
+            command:
+            - sh
+            - -c
+            - echo "Database Backup Completed"
+
+          restartPolicy: Never
+```
+
+---
+
+# Understanding the Configuration
+
+## CronJob Name
+
+```yaml
+metadata:
+  name: my-backup
+```
+
+Creates a CronJob named:
+
+```text
+my-backup
+```
+
+---
+
+## Schedule
+
+```yaml
+schedule: "0 2 * * *"
+```
+
+Meaning:
+
+```text
+Minute = 0
+Hour   = 2
+```
+
+Execution Time:
+
+```text
+Every Day at 2:00 AM
+```
+
+---
+
+## Job Template
+
+```yaml
+jobTemplate:
+```
+
+Defines the Job that will be created whenever the schedule triggers.
+
+---
+
+## Container
+
+```yaml
+containers:
+- name: mycronjob-backup
+  image: busybox
+```
+
+Container used to execute the scheduled task.
+
+---
+
+## Restart Policy
+
+```yaml
+restartPolicy: Never
+```
+
+If the Pod exits successfully:
+
+```text
+No Restart
+```
+
+---
+
+# Deploy CronJob
+
+Create the CronJob:
+
+```bash
+kubectl apply -f cronjob.yaml
+```
+
+Verify:
+
+```bash
+kubectl get cronjobs
+```
+
+Short Form:
+
+```bash
+kubectl get cj
+```
+
+Example Output:
+
+```text
+NAME         SCHEDULE      SUSPEND   ACTIVE   LAST SCHEDULE
+my-backup    0 2 * * *     False     0
+```
+
+---
+
+# View Created Jobs
+
+```bash
+kubectl get jobs
+```
+
+Example:
+
+```text
+NAME                     COMPLETIONS   DURATION
+my-backup-12345678       1/1           10s
+```
+
+Each scheduled execution creates a new Job.
+
+---
+
+# View Pods
+
+```bash
+kubectl get pods
+```
+
+Example:
+
+```text
+NAME                              STATUS
+my-backup-12345678-abcde          Completed
+```
+
+---
+
+# Check CronJob Details
+
+```bash
+kubectl describe cronjob my-backup
+```
+
+Displays:
+
+* Schedule
+* Last Execution Time
+* Active Jobs
+* Events
+
+---
+
+# View Logs
+
+Find the Pod:
+
+```bash
+kubectl get pods
+```
+
+View logs:
+
+```bash
+kubectl logs <pod-name>
+```
+
+Example Output:
+
+```text
+Database Backup Completed
+```
+
+---
+
+# Delete CronJob
+
+Delete the CronJob:
+
+```bash
+kubectl delete cronjob <cronjob-name>
+```
+
+Example:
+
+```bash
+kubectl delete cronjob my-backup
+```
+
+---
+
+# Real-Time Example
+
+Suppose an organization requires a database backup every day at 2:00 AM.
+
+Without CronJob:
+
+```text
+Administrator
+      │
+      ▼
+Manually Run Backup
+Every Day
+```
+
+With CronJob:
+
+```text
+CronJob
+      │
+      ▼
+Automatically Triggers
+At 2:00 AM Daily
+      │
+      ▼
+Creates Job
+      │
+      ▼
+Creates Pod
+      │
+      ▼
+Runs Backup
+      │
+      ▼
+Task Completed
+```
+
+No manual intervention is required.
+
+---
+
+# Job vs CronJob Example
+
+## Job
+
+```text
+Create Job
+    │
+    ▼
+Run Backup Once
+    │
+    ▼
+Completed
+```
+
+Used for:
+
+* One-Time Migration
+* One-Time Backup
+* Batch Processing
+
+---
+
+## CronJob
+
+```text
+Schedule Backup
+    │
+    ▼
+Run Every Day
+    │
+    ▼
+Automatic Execution
+```
+
+Used for:
+
+* Daily Backup
+* Weekly Cleanup
+* Monthly Reports
+* Scheduled Maintenance
+
+---
+
+# Summary
+
+## Kubernetes CronJob
+
+* Executes tasks automatically on a schedule.
+* Works similarly to Linux cron.
+* Creates a Job whenever the schedule triggers.
+* The Job creates a Pod to perform the task.
+* The Pod terminates after successful completion.
+* Ideal for recurring tasks.
+
+### Common Use Cases
+
+* Daily Database Backups
+* Log Cleanup
+* Report Generation
+* Data Synchronization
+* Health Checks
+* Maintenance Activities
+
+### Quick Overview
+
+```text
+CronJob
+   │
+   ▼
+Schedule Triggered
+   │
+   ▼
+Job Created
+   │
+   ▼
+Pod Created
+   │
+   ▼
+Task Executed
+   │
+   ▼
+Completed
+```
+---
+
+# Kubernetes Cordon and Uncordon
+
+## What is Cordon?
+
+**Cordon** is a Kubernetes node maintenance operation used to mark a node as **unschedulable**.
+
+When a node is cordoned:
+
+* Existing Pods continue running.
+* New Pods are not scheduled on that node.
+* Kubernetes schedules new Pods on other available nodes.
+
+This is commonly used before performing maintenance activities on a worker node.
+
+---
+
+# Why Do We Use Cordon?
+
+Cordon is used when a node requires maintenance but the currently running workloads should not be interrupted.
+
+Common scenarios:
+
+* Operating System Upgrades
+* Security Patching
+* Node Maintenance
+* Hardware Replacement
+* Troubleshooting
+* Kernel Updates
+
+---
+
+# Cordon Command
+
+```bash
+kubectl cordon <node-name>
+```
+
+Example:
+
+```bash
+kubectl cordon node01
+```
+
+---
+
+# How Cordon Works
+
+Before Cordon:
+
+```text
+Node01
+ ├── Pod-A
+ ├── Pod-B
+ └── Pod-C
+
+New Pods Can Be Scheduled
+```
+
+Execute:
+
+```bash
+kubectl cordon node01
+```
+
+After Cordon:
+
+```text
+Node01
+ ├── Pod-A (Running)
+ ├── Pod-B (Running)
+ └── Pod-C (Running)
+
+New Pods Cannot Be Scheduled
+```
+
+Kubernetes automatically schedules new Pods on other available worker nodes.
+
+---
+
+# Cordon Workflow
+
+```text
+Node Running Pods
+       │
+       ▼
+kubectl cordon node01
+       │
+       ▼
+Node Marked as Unschedulable
+       │
+       ▼
+Existing Pods Continue Running
+       │
+       ▼
+New Pods Scheduled on Other Nodes
+```
+
+---
+
+# Verify Cordoned Node
+
+Run:
+
+```bash
+kubectl get nodes
+```
+
+Example Output:
+
+```text
+NAME           STATUS
+controlplane   Ready
+node01         Ready,SchedulingDisabled
+```
+
+---
+
+# Understanding the Status
+
+```text
+Ready
+```
+
+Node is healthy and connected to the cluster.
+
+```text
+SchedulingDisabled
+```
+
+Node is cordoned.
+
+Kubernetes will not schedule new Pods on this node.
+
+---
+
+# Real-Time Example
+
+Suppose a worker node is running Ubuntu 24.04 and needs to be upgraded to Ubuntu 26.04.
+
+Current State:
+
+```text
+Worker Node
+ ├── Application Pod
+ ├── Database Pod
+ └── Monitoring Pod
+```
+
+Before performing the upgrade:
+
+```bash
+kubectl cordon node01
+```
+
+Result:
+
+```text
+Existing Pods Continue Running
+New Pods Are Not Scheduled
+```
+
+Now the node is ready for maintenance activities.
+
+---
+
+# Interview Definition
+
+**Cordon** is a Kubernetes node maintenance operation that marks a node as unschedulable. Existing Pods continue running on the node, but Kubernetes does not schedule any new Pods there. It is commonly used before performing OS upgrades, patching, troubleshooting, or maintenance activities.
+
+---
+
+# What is Uncordon?
+
+**Uncordon** is used to make a cordoned node schedulable again.
+
+After uncordoning:
+
+* The node becomes available for scheduling.
+* Kubernetes can place new Pods on the node.
+* Existing Pods remain unaffected.
+
+---
+
+# Uncordon Command
+
+```bash
+kubectl uncordon <node-name>
+```
+
+Example:
+
+```bash
+kubectl uncordon node01
+```
+
+---
+
+# How Uncordon Works
+
+Before Uncordon:
+
+```text
+Node01
+ ├── Pod-A
+ ├── Pod-B
+ └── Pod-C
+
+Status:
+SchedulingDisabled
+```
+
+Execute:
+
+```bash
+kubectl uncordon node01
+```
+
+After Uncordon:
+
+```text
+Node01
+ ├── Pod-A
+ ├── Pod-B
+ └── Pod-C
+
+New Pods Can Be Scheduled
+```
+
+---
+
+# Uncordon Workflow
+
+```text
+Node in SchedulingDisabled State
+           │
+           ▼
+kubectl uncordon node01
+           │
+           ▼
+Node Becomes Schedulable
+           │
+           ▼
+Kubernetes Can Schedule New Pods
+```
+
+---
+
+# Verify Uncordoned Node
+
+Run:
+
+```bash
+kubectl get nodes
+```
+
+Example Output:
+
+```text
+NAME           STATUS
+controlplane   Ready
+node01         Ready
+```
+
+Notice:
+
+```text
+SchedulingDisabled
+```
+
+is removed.
+
+This means the node can receive new Pods again.
+
+---
+
+# Maintenance Workflow Example
+
+## Step 1: Cordon the Node
+
+```bash
+kubectl cordon node01
+```
+
+Result:
+
+```text
+No New Pods Scheduled
+```
+
+---
+
+## Step 2: Perform Maintenance
+
+Examples:
+
+* Upgrade Operating System
+* Apply Security Patches
+* Update Software Packages
+* Troubleshoot Node Issues
+
+---
+
+## Step 3: Verify Node Health
+
+```bash
+kubectl get nodes
+```
+
+Ensure the node is healthy.
+
+---
+
+## Step 4: Uncordon the Node
+
+```bash
+kubectl uncordon node01
+```
+
+Result:
+
+```text
+Node Available for Scheduling
+```
+
+---
+
+# Cordon vs Uncordon
+
+| Cordon                          | Uncordon                        |
+| ------------------------------- | ------------------------------- |
+| Disables scheduling of new Pods | Enables scheduling of new Pods  |
+| Existing Pods continue running  | Existing Pods remain unaffected |
+| Used before maintenance         | Used after maintenance          |
+| Node becomes unschedulable      | Node becomes schedulable        |
+| Status shows SchedulingDisabled | Status shows Ready              |
+
+---
+
+# Example Scenario
+
+Cluster:
+
+```text
+Node01
+Node02
+Node03
+```
+
+Application:
+
+```text
+5 Replicas
+```
+
+After running:
+
+```bash
+kubectl cordon node01
+```
+
+Result:
+
+```text
+Existing Pods on Node01 continue running.
+
+Any new Pods are scheduled only on:
+
+Node02
+Node03
+```
+
+After maintenance:
+
+```bash
+kubectl uncordon node01
+```
+
+Result:
+
+```text
+Node01 can again receive new Pods.
+```
+
+---
+
+# Cordon vs Drain
+
+| Cordon                         | Drain                                        |
+| ------------------------------ | -------------------------------------------- |
+| Prevents new Pod scheduling    | Prevents scheduling and evicts existing Pods |
+| Existing Pods continue running | Existing Pods are moved to other nodes       |
+| Used for light maintenance     | Used for complete node maintenance           |
+| Node remains active            | Node is emptied of workloads                 |
+
+---
+
+# Quick Summary
+
+## Cordon
+
+```text
+Existing Pods = Running
+New Pods = Blocked
+```
+
+Command:
+
+```bash
+kubectl cordon <node-name>
+```
+
+---
+
+## Uncordon
+
+```text
+Existing Pods = Running
+New Pods = Allowed
+```
+
+Command:
+
+```bash
+kubectl uncordon <node-name>
+```
+
+---
+
+# Interview One-Liner
+
+**Cordon** is used to prevent new Pods from being scheduled on a node while keeping existing Pods running, typically during maintenance. **Uncordon** reverses this action and allows Kubernetes to schedule new Pods on the node again.
+
+---
+
+# Kubernetes Drain
+
+## What is Drain?
+
+**Drain** is a Kubernetes node maintenance operation used to safely remove all workload Pods from a node before performing maintenance activities.
+
+When a node is drained:
+
+1. The node is marked as **unschedulable** (similar to Cordon).
+2. Existing workload Pods are gracefully evicted from the node.
+3. Kubernetes reschedules those Pods onto other available worker nodes.
+4. The node becomes empty and ready for maintenance.
+
+Drain helps avoid application downtime during node maintenance.
+
+---
+
+# Why Do We Use Drain?
+
+Drain is commonly used before:
+
+* Operating System Upgrades
+* Security Patching
+* Hardware Replacement
+* Node Maintenance
+* Troubleshooting
+* Kernel Updates
+* Infrastructure Changes
+
+---
+
+# Real-Time Example
+
+Suppose a worker node is running **Ubuntu 24.04** and needs to be upgraded to **Ubuntu 26.04**.
+
+Current State:
+
+```text
+Worker Node (Ubuntu 24.04)
+       │
+       ▼
+Running Application Pods
+```
+
+If you directly reboot or upgrade the node:
+
+```text
+Applications May Be Impacted
+```
+
+Instead, drain the node:
+
+```bash
+kubectl drain node01 --ignore-daemonsets
+```
+
+Kubernetes will:
+
+```text
+Node01
+   │
+   ▼
+Evict Existing Pods
+   │
+   ▼
+Move Pods to Other Worker Nodes
+   │
+   ▼
+Node Becomes Empty
+   │
+   ▼
+Perform OS Upgrade
+```
+
+This ensures applications continue running on other worker nodes.
+
+---
+
+# How Drain Works
+
+```text
+Worker Node Running Pods
+          │
+          ▼
+kubectl drain node01
+          │
+          ▼
+Node Marked Unschedulable
+          │
+          ▼
+Existing Pods Evicted
+          │
+          ▼
+Pods Rescheduled to Other Nodes
+          │
+          ▼
+Node Becomes Empty
+```
+
+---
+
+# Drain Command
+
+```bash
+kubectl drain <node-name> --ignore-daemonsets
+```
+
+Example:
+
+```bash
+kubectl drain node01 --ignore-daemonsets
+```
+
+---
+
+# Why Use --ignore-daemonsets?
+
+DaemonSet Pods are managed automatically by Kubernetes.
+
+Examples:
+
+* Fluentd
+* Fluent Bit
+* Prometheus Node Exporter
+* Datadog Agent
+
+Since DaemonSet Pods run on every node, Kubernetes does not evict them during a drain operation.
+
+Therefore:
+
+```bash
+kubectl drain node01 --ignore-daemonsets
+```
+
+ignores DaemonSet Pods and drains only workload Pods.
+
+---
+
+# Complete Maintenance Workflow
+
+## Step 1: Prevent New Pods
+
+```bash
+kubectl cordon node01
+```
+
+Result:
+
+```text
+No New Pods Can Be Scheduled
+```
+
+---
+
+## Step 2: Evict Existing Pods
+
+```bash
+kubectl drain node01 --ignore-daemonsets
+```
+
+Result:
+
+```text
+Existing Pods Are Moved
+To Other Worker Nodes
+```
+
+---
+
+## Step 3: Perform Maintenance
+
+Examples:
+
+* Upgrade Ubuntu 24.04 → Ubuntu 26.04
+* Apply Security Patches
+* Replace Hardware
+* Update Node Software
+* Troubleshoot Issues
+
+---
+
+## Step 4: Enable Scheduling Again
+
+```bash
+kubectl uncordon node01
+```
+
+Result:
+
+```text
+Node Available For Scheduling Again
+```
+
+---
+
+# Drain Workflow
+
+```text
+Worker Node Running Pods
+          │
+          ▼
+kubectl cordon node01
+          │
+          ▼
+No New Pods Scheduled
+          │
+          ▼
+kubectl drain node01
+          │
+          ▼
+Existing Pods Evicted
+          │
+          ▼
+Pods Rescheduled To Other Nodes
+          │
+          ▼
+Node Becomes Empty
+          │
+          ▼
+Perform Maintenance
+          │
+          ▼
+kubectl uncordon node01
+          │
+          ▼
+Node Available Again
+```
+
+---
+
+# Verify Node Status
+
+Check node status:
+
+```bash
+kubectl get nodes
+```
+
+Example Output:
+
+```text
+NAME           STATUS
+controlplane   Ready
+node01         Ready,SchedulingDisabled
+```
+
+Meaning:
+
+```text
+Ready
+```
+
+Node is healthy.
+
+```text
+SchedulingDisabled
+```
+
+Node is unavailable for new Pod scheduling.
+
+---
+
+# Example Cluster Scenario
+
+Cluster:
+
+```text
+Node01
+Node02
+Node03
+```
+
+Applications:
+
+```text
+Node01
+ ├── Pod-A
+ ├── Pod-B
+ └── Pod-C
+```
+
+Execute:
+
+```bash
+kubectl drain node01 --ignore-daemonsets
+```
+
+Result:
+
+```text
+Node01
+ └── Empty
+
+Node02
+ ├── Pod-A
+
+Node03
+ ├── Pod-B
+ └── Pod-C
+```
+
+Applications continue running without interruption.
+
+---
+
+# Cordon vs Drain
+
+| Cordon                              | Drain                                    |
+| ----------------------------------- | ---------------------------------------- |
+| Stops new Pods from being scheduled | Stops new Pods and removes existing Pods |
+| Existing Pods continue running      | Existing Pods are evicted                |
+| Node remains occupied               | Node becomes empty                       |
+| Used before maintenance             | Used to prepare a node for maintenance   |
+| No workload migration               | Workloads are migrated to other nodes    |
+
+---
+
+# Drain vs Uncordon
+
+| Drain                               | Uncordon                        |
+| ----------------------------------- | ------------------------------- |
+| Removes workload Pods from the node | Allows new Pods to be scheduled |
+| Node becomes empty                  | Node becomes active again       |
+| Used before maintenance             | Used after maintenance          |
+| Scheduling remains disabled         | Scheduling is enabled           |
+
+---
+
+# Important Notes
+
+### Drain Does Not Delete Applications
+
+Drain only removes Pods from the node.
+
+```text
+Pod Removed
+      │
+      ▼
+Pod Recreated On Another Node
+```
+
+Applications continue running.
+
+---
+
+### Drain Requires Available Nodes
+
+For successful Pod migration:
+
+```text
+Node01  → Drained
+
+Node02  → Available
+Node03  → Available
+```
+
+Other worker nodes must have enough resources to host the migrated Pods.
+
+---
+
+### DaemonSet Pods Are Not Evicted
+
+Examples:
+
+* Monitoring Agents
+* Logging Agents
+* Security Agents
+
+These Pods remain on the node unless manually removed.
+
+---
+
+# Interview Definition
+
+**Drain** is a Kubernetes node maintenance operation used to safely evict all running workload Pods from a node and reschedule them onto other available worker nodes. It automatically marks the node as unschedulable and is commonly used before operating system upgrades, patching, hardware replacement, or infrastructure maintenance.
+
+---
+
+# Interview One-Liner
+
+**Cordon prevents new Pods from being scheduled on a node, while Drain both prevents new Pods and safely migrates existing Pods to other nodes, making the node ready for maintenance activities such as OS upgrades and patching.**
+
+---
+
+# Quick Summary
+
+## Cordon
+
+```text
+Existing Pods = Running
+New Pods = Blocked
+```
+
+Command:
+
+```bash
+kubectl cordon <node-name>
+```
+
+---
+
+## Drain
+
+```text
+Existing Pods = Evicted
+New Pods = Blocked
+Node = Empty
+```
+
+Command:
+
+```bash
+kubectl drain <node-name> --ignore-daemonsets
+```
+
+---
+
+## Uncordon
+
+```text
+Existing Pods = Unaffected
+New Pods = Allowed
+```
+
+Command:
+
+```bash
+kubectl uncordon <node-name>
+```
+
+---
+
+# Complete Node Maintenance Lifecycle
+
+```text
+Node Running Pods
+       │
+       ▼
+kubectl cordon node01
+       │
+       ▼
+No New Pods Scheduled
+       │
+       ▼
+kubectl drain node01 --ignore-daemonsets
+       │
+       ▼
+Pods Moved To Other Nodes
+       │
+       ▼
+Node Empty
+       │
+       ▼
+Perform Maintenance
+       │
+       ▼
+kubectl uncordon node01
+       │
+       ▼
+Node Ready For Scheduling
+```
+
+---
